@@ -6,7 +6,6 @@ import Header from "../components/Header";
 import Image from "next/image";
 
 const About: React.FC = () => {
-  const [activeStep, setActiveStep] = React.useState(0);
 
   // Function to split text into words and wrap each in a motion.span
   const renderTextWithHover = (text: string) => {

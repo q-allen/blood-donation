@@ -330,22 +330,49 @@ const ProfileEditPopup: React.FC = () => {
               </motion.select>
               <div className="flex justify-end space-x-3 mt-4">
                 <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
                   type="button"
                   onClick={handleClose}
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition text-sm"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400 transition"
                 >
                   Cancel
                 </motion.button>
+
                 <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
                   type="submit"
                   disabled={loading}
-                  className="px-4 py-2 bg-gradient-to-r from-red-600 to-red-800 text-white rounded-md hover:bg-red-700 transition text-sm"
+                  whileHover={{ scale: loading ? 1 : 1.05 }}
+                  whileTap={{ scale: loading ? 1 : 0.95 }}
+                  className={`px-4 py-2 rounded transition font-semibold ${
+                    loading
+                      ? "bg-red-400 cursor-not-allowed"
+                      : "bg-red-600 hover:bg-red-700"
+                  } text-white flex items-center justify-center space-x-2`}
                 >
-                  {loading ? "Saving..." : "Save Changes"}
+                  {loading && (
+                    <svg
+                      className="animate-spin h-4 w-4 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v8z"
+                      ></path>
+                    </svg>
+                  )}
+                  <span>{loading ? "Updating..." : "Update"}</span>
                 </motion.button>
               </div>
             </form>

@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import Header from "../components/Header";
 import { useSearchParams } from "next/navigation";
 import axios from "axios";
+import Image from "next/image";
 
 const healthQuestions = [
   "Have you had a recent illness or infection?",
@@ -44,7 +45,7 @@ const Donate: React.FC = () => {
     IdCard: null as File | null,
   });
 
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
   const [fileName, setFileName] = useState<string | null>(null);
   const controls = useAnimation();
 
@@ -206,7 +207,7 @@ const Donate: React.FC = () => {
       >
         {/* Image Placeholder */}
         <div className="relative">
-          <img
+          <Image
             src={image || "image"}
             alt={name || "name"}
             width={200}

@@ -19,7 +19,7 @@ interface Hospital {
 
 export default function BloodDonationCenters() {
   const [centers, setCenters] = useState<Hospital[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [, setIsLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
