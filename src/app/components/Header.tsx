@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { User } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
+import Image from "next/image";
 
 interface Users {
   id: number;
@@ -37,8 +38,12 @@ export default function Header() {
         });
 
         setUser(res.data);
-      } catch (err: any) {
-        console.error("❌ Fetch User Failed:", err.response?.data || err);
+      } catch (err) {
+        if (axios.isAxiosError(err)) {
+          console.error("❌ Fetch User Failed:", err.response?.data || err.message);
+        } else {
+          console.error("❌ Fetch User Failed:", err);
+        }
         setUser(null);
       }
     };

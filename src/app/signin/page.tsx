@@ -45,8 +45,8 @@ export default function LoginPage() {
       localStorage.setItem("access", res.data.access);
       alert("Successfully logged in!");
       router.push("/");
-    } catch (err: any) {
-      if (err.response) {
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response) {
         setError(err.response.data.error || "Invalid email or password.");
       } else {
         setError("Something went wrong. Please try again.");
@@ -156,7 +156,7 @@ export default function LoginPage() {
               </motion.button>
 
               <p className="text-center text-black text-sm mt-4">
-                Don't have an account?{" "}
+                Don&apos;t have an account?{" "}
                 <Link href="/signup" className="text-red-700 hover:underline">
                   Sign up
                 </Link>

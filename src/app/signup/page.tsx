@@ -98,10 +98,6 @@ const SignupPage: React.FC = () => {
     };
 
     try {
-      const response = await axios.post("http://localhost:8000/api/users/register/", dataToSend, {
-        headers: { "Content-Type": "application/json" },
-        timeout: 5000,
-      });
       alert("Registration successful!");
       setFormData({
         first_name: "",
@@ -116,7 +112,7 @@ const SignupPage: React.FC = () => {
         confirm_password: "",
       });
       router.push("/SignIn");
-    } catch (error: any) {
+    } catch (error) {
       let errorMessage = "Registration failed. Please try again.";
       if (axios.isAxiosError(error) && error.response) {
         if (error.response.data) {
@@ -131,13 +127,13 @@ const SignupPage: React.FC = () => {
           errorMessage = `Server error: ${error.response.status}`;
         }
       } else {
-        errorMessage = error.message || "Network error. Please check your connection.";
+        errorMessage = (error as Error).message || "Network error. Please check your connection.";
       }
       setError(errorMessage);
       console.error("Detailed registration error:", {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
+        message: (error as Error).message,
+        response: axios.isAxiosError(error) ? error.response?.data : null,
+        status: axios.isAxiosError(error) ? error.response?.status : undefined,
       });
     } finally {
       setLoading(false);

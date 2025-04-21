@@ -57,8 +57,12 @@ const ProfileEditPopup: React.FC = () => {
           gender: res.data.gender || "",
           email: res.data.email || "",
         });
-      } catch (err: any) {
-        console.error("Fetch User Failed:", err.response?.data || err.message);
+      } catch (err) {
+        if (axios.isAxiosError(err)) {
+          console.error("Fetch User Failed:", err.response?.data || err.message);
+        } else {
+          console.error("Fetch User Failed:", err);
+        }
         setError("Failed to load user data. Please try again.");
       }
     };
@@ -164,7 +168,7 @@ const ProfileEditPopup: React.FC = () => {
       });
       handleClose();
       router.refresh();
-    } catch (error: any) {
+    } catch (error) {
       let errorMessage = "Profile update failed. Please try again.";
       if (axios.isAxiosError(error) && error.response) {
         if (error.response.data) {
@@ -187,13 +191,13 @@ const ProfileEditPopup: React.FC = () => {
           errorMessage = `Server error: ${error.response.status}`;
         }
       } else {
-        errorMessage = error.message || "Network error. Please check your connection.";
+        errorMessage = (error as Error).message || "Network error. Please check your connection.";
       }
       setError(errorMessage);
       console.error("Detailed profile update error:", {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
+        message: (error as Error).message,
+        response: axios.isAxiosError(error) ? error.response?.data : undefined,
+        status: axios.isAxiosError(error) ? error.response?.status : undefined,
       });
     } finally {
       setLoading(false);
