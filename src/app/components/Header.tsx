@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { User } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
-import Image from "next/image";
 
 interface Users {
   id: number;

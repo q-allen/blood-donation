@@ -85,17 +85,6 @@ const SignupPage: React.FC = () => {
       return;
     }
 
-    const dataToSend = {
-      first_name: formData.first_name,
-      middle_name: formData.middle_name || null,
-      last_name: formData.last_name,
-      username: formData.username,
-      contact: formData.contact,
-      address: formData.address,
-      gender: formData.gender,
-      email: formData.email,
-      password: formData.password,
-    };
 
     try {
       alert("Registration successful!");
