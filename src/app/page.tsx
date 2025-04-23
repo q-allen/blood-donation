@@ -16,7 +16,7 @@ import { useRouter } from "next/navigation";
     animate={{ opacity: 1, y: 0 }}
     exit={{ opacity: 0, y: -20 }}
     transition={{ duration: 0.8, ease: "easeOut" }}
-    className="bg-white text-gray-900 min-h-screen px-10 py-4 relative z-0" // Set z-index to 0 for background
+    className="bg-white text-gray-900 min-h-screen py-6 relative" // Set z-index to 0 for background
   >
     {/* Header */}
     <div className="relative z-10"> {/* Header on top with higher z-index */}
@@ -24,7 +24,7 @@ import { useRouter } from "next/navigation";
     </div>
 
     {/* Main Content */}
-    <div className="flex flex-col md:flex-row items-center relative z-0"> {/* Content stays behind */}
+    <div className="flex flex-col md:flex-row items-center px-10 relative z-0"> {/* Content stays behind */}
       {/* Left Section */}
       <motion.div
         initial={{ x: -50, opacity: 0 }}
