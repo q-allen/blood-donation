@@ -1,11 +1,9 @@
-// src/app/DonateForm/DonateFormContent.tsx
 "use client";
 import React, { useState, useEffect } from "react";
 import { useAnimation } from "framer-motion";
 import { MapPin } from "lucide-react";
 import { motion } from "framer-motion";
 import Header from "@/app/components/Header";
-import { useSearchParams } from "next/navigation";
 import axios from "axios";
 import Image from "next/image";
 
@@ -20,14 +18,15 @@ const healthQuestions = [
   "Have you had a tattoo or piercing in the last 6 months?",
 ];
 
-const DonateFormContent: React.FC = () => {
-  const searchParams = useSearchParams();
-  const id = searchParams.get("id");
-  const name = searchParams.get("name");
-  const description = searchParams.get("description");
-  const location = searchParams.get("location");
-  const image = searchParams.get("image");
+interface DonateFormContentProps {
+  id: string;
+  name: string;
+  description: string;
+  location: string;
+  image: string;
+}
 
+const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, description, location, image }) => {
   const [formData, setFormData] = useState({
     firstName: "",
     middleName: "",
