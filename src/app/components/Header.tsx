@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { User } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
+import Image from "next/image";
 
 interface Users {
   id: number;
@@ -71,7 +72,15 @@ export default function Header() {
   return (
     <header className="flex  justify-between items-center bg-white text-red-600 px-10 py-6">
       {/* Logo */}
-      <img src="/images/logo.png" alt="Blood Logo" className="h-8 cursor-pointer" onClick={() => router.push("/")} />
+      <Image
+        src="/images/logo.png"
+        alt="Blood Logo"
+        width={100}
+        height={32}
+        style={{ width: "auto", height: "32px" }}
+        className="cursor-pointer"
+        onClick={() => router.push("/")}
+      />
 
       {/* Navigation Links */}
       <div className="flex gap-6">
