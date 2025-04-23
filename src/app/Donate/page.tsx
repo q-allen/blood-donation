@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import Header from "../components/Header";
+import Header from "../../components/Header";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import HeroCarousel from "../components/HeroCarousel";
+import HeroCarousel from "../../components/HeroCarousel";
 import { FaTimes, FaExclamationCircle } from "react-icons/fa"; // Import icons
 
 interface Hospital {

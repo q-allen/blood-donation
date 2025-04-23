@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useAnimation } from "framer-motion";
 import { MapPin } from "lucide-react";
 import { motion } from "framer-motion";
-import Header from "@/app/components/Header";
+import Header from "@/components/Header";
 import axios from "axios";
 import Image from "next/image";
 

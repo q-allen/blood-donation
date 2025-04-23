@@ -2,9 +2,9 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import Header from "./components/Header"; // Ensure your navbar component is imported
-import HeroCarousel from "./components/HeroCarousel";
-import About from "./components/about";
+import Header from "@/components/Header"; // Ensure your navbar component is imported
+import HeroCarousel from "../components/HeroCarousel";
+import About from "../components/about";
 import { useRouter } from "next/navigation";
 
   export default function Page() {

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
-import Header from "../components/Header";
+import Header from "../../components/Header";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 

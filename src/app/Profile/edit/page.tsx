@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
-import Header from "@/app/components/Header";
+import Header from "@/components/Header";
 import { useRouter } from "next/navigation";
 
 interface UserDetails {

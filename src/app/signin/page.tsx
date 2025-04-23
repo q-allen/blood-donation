@@ -3,7 +3,7 @@ import { useState } from "react";
 import { FaUser, FaLock } from "react-icons/fa";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import Header from "../components/Header";
+import Header from "../../components/Header";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 

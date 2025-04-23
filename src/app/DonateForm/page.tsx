@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import DonateFormContent from "../components/DonateFormContent";
+import DonateFormContent from "../../components/DonateFormContent";
 
 export default function DonateFormPage({
   searchParams,
