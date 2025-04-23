@@ -1,8 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['127.0.0.1'], // Add your API hostname here
-    // OR use remotePatterns for more specific control:
     remotePatterns: [
       {
         protocol: 'http',
@@ -11,6 +9,9 @@ const nextConfig = {
         pathname: '/hospital_images/**',
       },
     ],
+  },
+  experimental: {
+    allowedDevOrigins: ['http://192.168.254.152'], // Add this to suppress the dev warning
   },
 };
 

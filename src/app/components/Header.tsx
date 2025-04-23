@@ -121,30 +121,38 @@ export default function Header() {
           </motion.button>
 
           <AnimatePresence>
-            {dropdownOpen && users && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-                className="absolute right-0 mt-2 w-40 bg-gray-800 rounded shadow-lg"
-              >
+          {dropdownOpen && users && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="absolute right-0 mt-2 w-48 bg-gray-900 rounded-lg shadow-xl border border-gray-700/50 z-50"
+            >
+              <div className="py-1">
                 <button
-                  onClick={() => router.push("/Profile")} // Profile -> /profile
-                  className="block w-full text-left px-4 py-2 text-white hover:bg-gray-700"
+                  onClick={() => router.push("/Profile")}
+                  className="flex items-center w-full text-left px-4 py-2 text-gray-100 hover:bg-gray-800 hover:text-white transition-colors duration-200"
                 >
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
                   Profile
                 </button>
 
                 <button
                   onClick={handleLogout}
-                  className="block w-full text-left px-4 py-2 text-red-400 hover:bg-gray-700"
+                  className="flex items-center w-full text-left px-4 py-2 text-red-400 hover:bg-gray-800 hover:text-red-300 transition-colors duration-200"
                 >
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
                   Logout
                 </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
         </div>
     </header>
   );
