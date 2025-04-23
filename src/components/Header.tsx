@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { User } from "lucide-react";
+import { User, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 import Image from "next/image";
@@ -17,6 +17,7 @@ interface Users {
 export default function Header() {
   const [users, setUser] = useState<Users | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -69,67 +70,80 @@ export default function Header() {
     router.push("/signin");
   };
 
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+
   return (
-    <header className="flex  justify-between items-center bg-white text-red-600 px-10 py-6">
-      {/* Logo */}
-      <Image
-        src="/images/logo.png"
-        alt="Blood Logo"
-        width={100}
-        height={32}
-        style={{ width: "auto", height: "32px" }}
-        className="cursor-pointer"
-        onClick={() => router.push("/")}
-      />
+    <header className="flex flex-col sm:flex-row justify-between items-center bg-white text-red-600 px-4 sm:px-10 py-4 sm:py-6">
+      {/* Logo and Hamburger Menu */}
+      <div className="flex justify-between items-center w-full sm:w-auto">
+        <Image
+          src="/images/logo.png"
+          alt="Blood Logo"
+          width={100}
+          height={32}
+          style={{ width: "auto", height: "32px" }}
+          className="cursor-pointer"
+          onClick={() => router.push("/")}
+        />
+        <button
+          className="sm:hidden p-2"
+          onClick={toggleMobileMenu}
+          aria-label="Toggle mobile menu"
+        >
+          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        </button>
+      </div>
 
       {/* Navigation Links */}
-      <div className="flex gap-6">
+      <div className={`flex flex-col sm:flex-row gap-4 sm:gap-6 mt-4 sm:mt-0 w-full sm:w-auto ${mobileMenuOpen ? "flex" : "hidden sm:flex"}`}>
         <motion.button
           whileHover={{ scale: 1.1 }}
-          onClick={() => router.push("/")} // Home -> /
-          className="hover:underline"
+          onClick={() => router.push("/")}
+          className="hover:underline text-lg sm:text-base"
         >
           Home
         </motion.button>
 
         <motion.button
           whileHover={{ scale: 1.1 }}
-          onClick={() => router.push("/Donate")} // Donate -> /donate
-          className="hover:underline"
+          onClick={() => router.push("/Donate")}
+          className="hover:underline text-lg sm:text-base"
         >
           Donate
         </motion.button>
 
         <motion.button
           whileHover={{ scale: 1.1 }}
-          onClick={() => router.push("/About")} // About -> /about
-          className="hover:underline"
+          onClick={() => router.push("/About")}
+          className="hover:underline text-lg sm:text-base"
         >
           About
         </motion.button>
 
         <motion.button
           whileHover={{ scale: 1.1 }}
-          onClick={() => router.push("/Contact")} // Contact Us -> /contact
-          className="hover:underline"
+          onClick={() => router.push("/Contact")}
+          className="hover:underline text-lg sm:text-base"
         >
           Contact Us
         </motion.button>
       </div>
 
       {/* Profile Dropdown */}
-      <div className="relative">
-          <motion.button
-            type="button"
-            className="p-2 hover:text-gray-400 flex items-center"
-            whileHover={{ scale: 1.2 }}
-            onClick={handleProfileClick}
-          >
-            <User className="w-6 h-6" />
-            {users && <span className="text-sm font-medium ml-2">{users.username}</span>}
-          </motion.button>
+      <div className="relative mt-4 sm:mt-0">
+        <motion.button
+          type="button"
+          className="p-2 hover:text-gray-400 flex items-center"
+          whileHover={{ scale: 1.2 }}
+          onClick={handleProfileClick}
+        >
+          <User className="w-6 h-6" />
+          {users && <span className="text-sm font-medium ml-2">{users.username}</span>}
+        </motion.button>
 
-          <AnimatePresence>
+        <AnimatePresence>
           {dropdownOpen && users && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
@@ -162,7 +176,7 @@ export default function Header() {
             </motion.div>
           )}
         </AnimatePresence>
-        </div>
+      </div>
     </header>
   );
 }
