@@ -38,9 +38,7 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
     phone: "",
     email: "",
     lastDonationDate: "",
-    healthIssues: Object.fromEntries(
-      healthQuestions.map((_, index) => [`healthIssues_${index}`, ""])
-    ),
+    healthIssues: Object.fromEntries(healthQuestions.map((_, index) => [`healthIssues_${index}`, ""])),
     eligibilityConfirmed: false,
     address: "",
     parentalConsent: false,
@@ -207,7 +205,7 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
         >
           <div className="relative">
             <Image
-              src={image || "/placeholder.jpg"} // Use a fallback image
+              src={image || "/placeholder.jpg"}
               alt={name || "Hospital"}
               width={200}
               height={200}
