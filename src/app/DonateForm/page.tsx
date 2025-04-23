@@ -1,6 +1,6 @@
 // src/app/DonateForm/page.tsx
 import { Suspense } from "react";
-import DonateFormContent from "./DonateFormContent/page";
+import DonateFormContent from "../components/DonateFormContent/page";
 
 export default function DonateFormPage() {
   return (
