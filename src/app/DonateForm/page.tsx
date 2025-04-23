@@ -1,20 +1,18 @@
 import { Suspense } from "react";
 import DonateFormContent from "../../components/DonateFormContent";
 
-// Define the props type explicitly
+// Define the props type correctly
 interface DonateFormPageProps {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  searchParams: { [key: string]: string | string[] | undefined };
 }
 
-export default async function DonateFormPage({ searchParams }: DonateFormPageProps) {
-  // Await searchParams since it's a Promise
-  const params = await searchParams;
-  
-  const id = typeof params.id === "string" ? params.id : "";
-  const name = typeof params.name === "string" ? params.name : "";
-  const description = typeof params.description === "string" ? params.description : "";
-  const location = typeof params.location === "string" ? params.location : "";
-  const image = typeof params.image === "string" ? params.image : "";
+export default function DonateFormPage({ searchParams }: DonateFormPageProps) {
+  // No need to await searchParams since it's not a Promise
+  const id = typeof searchParams.id === "string" ? searchParams.id : "";
+  const name = typeof searchParams.name === "string" ? searchParams.name : "";
+  const description = typeof searchParams.description === "string" ? searchParams.description : "";
+  const location = typeof searchParams.location === "string" ? searchParams.location : "";
+  const image = typeof searchParams.image === "string" ? searchParams.image : "";
 
   return (
     <Suspense fallback={<div>Loading...</div>}>
