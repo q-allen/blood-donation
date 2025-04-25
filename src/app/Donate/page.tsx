@@ -22,6 +22,7 @@ export default function BloodDonationCenters() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const apiUrl = "https://backend-bwoh.onrender.com/"; // Update with your API URL
 
   // Check if user is authenticated
   const isAuthenticated = () => {
@@ -35,7 +36,7 @@ export default function BloodDonationCenters() {
     const fetchHospitals = async () => {
       try {
         setIsLoading(true);
-        const response = await axios.get("http://127.0.0.1:8000/api/hospitals/");
+        const response = await axios.get(`${apiUrl}/api/hospitals/`);
         setCenters(response.data);
       } catch (error) {
         console.error("Error fetching hospitals:", error);
