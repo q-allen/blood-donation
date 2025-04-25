@@ -38,7 +38,7 @@ export default function LoginPage() {
     }
 
     try {
-      const res = await axios.post("${apiUrl}/api/users/signin/", {
+      const res = await axios.post(`${apiUrl}'/api/users/signin/`, {
         email,
         password,
       });
