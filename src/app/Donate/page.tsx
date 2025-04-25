@@ -36,7 +36,7 @@ export default function BloodDonationCenters() {
     const fetchHospitals = async () => {
       try {
         setIsLoading(true);
-        const response = await axios.get(`${apiUrl}/api/hospitals/`);
+        const response = await axios.get(`${apiUrl}/api/hospitals/hospitals/`);
         setCenters(response.data);
       } catch (error) {
         console.error("Error fetching hospitals:", error);
