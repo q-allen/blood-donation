@@ -22,7 +22,7 @@ export default function BloodDonationCenters() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const apiUrl = "https://backend-bwoh.onrender.com/"; // Update with your API URL
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL; // Update with your API URL
 
   // Check if user is authenticated
   const isAuthenticated = () => {
