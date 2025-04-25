@@ -100,7 +100,7 @@ const SignupPage: React.FC = () => {
         password: "",
         confirm_password: "",
       });
-      router.push("/SignIn");
+      router.push("/signin");
     } catch (error) {
       let errorMessage = "Registration failed. Please try again.";
       if (axios.isAxiosError(error) && error.response) {
