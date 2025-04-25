@@ -24,6 +24,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
   const router = useRouter();
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +38,7 @@ export default function LoginPage() {
     }
 
     try {
-      const res = await axios.post("http://localhost:8000/api/users/signin/", {
+      const res = await axios.post("${apiUrl}/api/users/signin/", {
         email,
         password,
       });
