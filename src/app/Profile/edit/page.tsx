@@ -30,6 +30,7 @@ const EditProfile: React.FC = () => {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, ""); // Remove trailing slash
   const router = useRouter();
 
   useEffect(() => {
@@ -43,7 +44,7 @@ const EditProfile: React.FC = () => {
       }
 
       try {
-        const res = await axios.get("http://localhost:8000/api/users/profile/", {
+        const res = await axios.get(`${apiUrl}/api/users/profile/`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setFormData({
