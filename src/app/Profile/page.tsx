@@ -72,7 +72,7 @@ const ProfileEditPopup: React.FC = () => {
   const getInitials = () => {
     const firstInitial = formData.first_name ? formData.first_name[0] : "";
     const lastInitial = formData.last_name ? formData.last_name[0] : "";
-    return `${firstInitial}${lastInitial}`.toUpperCase() || "JD";
+    return `${firstInitial}${lastInitial}`.toUpperCase();
   };
 
   return (

@@ -278,7 +278,7 @@ const EditProfile: React.FC = () => {
   const getInitials = () => {
     const firstInitial = formData.first_name ? formData.first_name[0] : "";
     const lastInitial = formData.last_name ? formData.last_name[0] : "";
-    return `${firstInitial}${lastInitial}`.toUpperCase() || "JD";
+    return `${firstInitial}${lastInitial}`.toUpperCase();
   };
 
   return (
@@ -310,33 +310,11 @@ const EditProfile: React.FC = () => {
           )}
 
           <div className="flex flex-col sm:flex-row sm:space-x-6">
-            {/* Left Side: Avatar and Edit Button */}
+            {/* Left Side: Avatar */}
             <div className="flex flex-col items-center sm:items-start">
               <div className="w-24 h-24 rounded-full bg-red-100 flex items-center justify-center text-red-600 text-2xl font-semibold mb-4">
                 {getInitials()}
               </div>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => router.push("/Profile")}
-                className="flex items-center space-x-2 text-red-600 hover:text-red-700 font-medium"
-              >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.536L15.232 5.232z"
-                  ></path>
-                </svg>
-                <span>Back to Profile</span>
-              </motion.button>
             </div>
 
             {/* Right Side: Edit Form */}
