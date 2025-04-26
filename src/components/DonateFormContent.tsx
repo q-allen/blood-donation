@@ -46,10 +46,11 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
     IdCard: null as File | null,
   });
 
-  const [, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [fileName, setFileName] = useState<string | null>(null);
+  const [errors, setErrors] = useState<string[]>([]);
   const controls = useAnimation();
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL; // Update with your API URL
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, ""); // Remove trailing slash
 
   useEffect(() => {
     const handleScroll = () => {
@@ -68,6 +69,7 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+    setErrors([]); // Clear errors on input change
   };
 
   const handleRadioChange = (index: number, value: string) => {
@@ -75,6 +77,7 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
       ...prev,
       healthIssues: { ...prev.healthIssues, [`healthIssues_${index}`]: value },
     }));
+    setErrors([]);
   };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,47 +91,110 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
       });
     } else {
       console.log("No file selected in handleImageUpload");
-      alert("No file selected. Please upload a valid identification card.");
+      setErrors(["Please upload a valid identification card."]);
     }
+  };
+
+  const validateDate = (date: string): boolean => {
+    if (!date) return true; // Empty date is valid for optional fields
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(date)) return false;
+    const parsedDate = new Date(date);
+    return !isNaN(parsedDate.getTime()); // Ensure it's a valid date
+  };
+
+  const calculateAge = (dob: string): number => {
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setErrors([]);
+    setLoading(true);
+
+    // Validate inputs
+    const newErrors: string[] = [];
 
     if (!id || isNaN(parseInt(id))) {
-      alert("Invalid hospital selection. Please select a hospital first.");
-      return;
+      newErrors.push("Invalid hospital selection. Please select a hospital first.");
     }
 
     const age = parseInt(formData.age, 10);
     const weight = parseFloat(formData.weight);
     const today = new Date().toISOString().split("T")[0];
 
-    if (age < 16) {
-      alert("You must be at least 16 years old to donate blood.");
-      return;
+    // Validate date_of_birth
+    if (!formData.dateOfBirth) {
+      newErrors.push("Date of birth is required.");
+    } else if (!validateDate(formData.dateOfBirth)) {
+      newErrors.push("Date of birth must be in YYYY-MM-DD format (e.g., 1990-01-01).");
+    } else if (formData.dateOfBirth > today) {
+      newErrors.push("Date of birth cannot be in the future.");
     }
-    if (weight < 110) {
-      alert("You must weigh at least 110 lbs to donate blood.");
-      return;
+
+    // Validate age
+    if (!formData.age) {
+      newErrors.push("Age is required.");
+    } else if (isNaN(age) || age < 16) {
+      newErrors.push("You must be at least 16 years old to donate blood.");
     }
-    if (!formData.eligibilityConfirmed) {
-      alert("You must confirm that you meet all donation requirements.");
-      return;
+
+    // Validate age against date_of_birth
+    if (formData.dateOfBirth && validateDate(formData.dateOfBirth)) {
+      const calculatedAge = calculateAge(formData.dateOfBirth);
+      if (!isNaN(age) && Math.abs(calculatedAge - age) > 1) {
+        newErrors.push(`Age (${age}) does not match date of birth (expected ~${calculatedAge}).`);
+      }
     }
-    if (!formData.firstName || !formData.lastName || !formData.dateOfBirth || !formData.address) {
-      alert("Please fill in all required fields.");
-      return;
+
+    // Validate weight
+    if (isNaN(weight) || weight < 110) {
+      newErrors.push("You must weigh at least 110 lbs to donate blood.");
     }
-    if (formData.dateOfBirth > today) {
-      alert("Date of birth cannot be in the future.");
-      return;
+
+    // Validate last_donation_date
+    if (formData.lastDonationDate && !validateDate(formData.lastDonationDate)) {
+      newErrors.push("Last donation date must be in YYYY-MM-DD format (e.g., 2023-10-15).");
     }
     if (formData.lastDonationDate && formData.lastDonationDate > today) {
-      alert("Last donation date cannot be in the future.");
+      newErrors.push("Last donation date cannot be in the future.");
+    }
+
+    // Validate required fields
+    if (!formData.firstName || !formData.lastName || !formData.address) {
+      newErrors.push("Please fill in all required fields (First Name, Last Name, Address).");
+    }
+    if (!formData.eligibilityConfirmed) {
+      newErrors.push("You must confirm that you meet all donation requirements.");
+    }
+    if (!formData.IdCard) {
+      newErrors.push("Please upload an identification card.");
+    }
+    if (age < 18 && !formData.parentalConsent) {
+      newErrors.push("Parental consent is required for donors under 18.");
+    }
+
+    // Validate health questions
+    healthQuestions.forEach((_, index) => {
+      if (!formData.healthIssues[`healthIssues_${index}`]) {
+        newErrors.push(`Please answer health question: ${healthQuestions[index]}`);
+      }
+    });
+
+    if (newErrors.length > 0) {
+      setErrors(newErrors);
+      setLoading(false);
       return;
     }
 
+    // Prepare FormData
     const formDataToSubmit = new FormData();
     formDataToSubmit.append("hospital", id.toString());
     formDataToSubmit.append("first_name", formData.firstName);
@@ -153,19 +219,16 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
     formDataToSubmit.append("tattoo_or_piercing_last_six_months", formData.healthIssues.healthIssues_7 === "yes" ? "true" : "false");
     formDataToSubmit.append("meets_eligibility", formData.eligibilityConfirmed.toString());
 
-    console.log("formData.IdCard before append:", formData.IdCard ? formData.IdCard.name : "null");
     if (formData.IdCard) {
       formDataToSubmit.append("id_card", formData.IdCard);
       console.log("File attached to FormData:", formData.IdCard.name, formData.IdCard.size);
-    } else {
-      console.log("No id_card file in formData");
     }
 
-    setLoading(true);
-
     try {
-      
-      const response = await axios.post(`${apiUrl}api/blood_donation/`, formDataToSubmit, {
+      console.log("Submitting to:", `${apiUrl}/api/blood_donation/`);
+      console.log("FormData entries:", Object.fromEntries(formDataToSubmit));
+
+      const response = await axios.post(`${apiUrl}/api/blood_donation/`, formDataToSubmit, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -173,16 +236,46 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
 
       if (response.status === 201) {
         alert("Thank you for your willingness to donate blood!");
+        // Reset form
+        setFormData({
+          firstName: "",
+          middleName: "",
+          lastName: "",
+          age: "",
+          weight: "",
+          gender: "",
+          bloodType: "",
+          phone: "",
+          email: "",
+          lastDonationDate: "",
+          healthIssues: Object.fromEntries(healthQuestions.map((_, index) => [`healthIssues_${index}`, ""])),
+          eligibilityConfirmed: false,
+          address: "",
+          parentalConsent: false,
+          dateOfBirth: "",
+          IdCard: null,
+        });
+        setFileName(null);
       }
     } catch (error) {
-      console.log("Data sent:", Object.fromEntries(formDataToSubmit));
-      if (axios.isAxiosError(error)) {
-        console.error("Error submitting form:", error.response?.data || error.message);
+      let errorMessages: string[] = [];
+      if (axios.isAxiosError(error) && error.response?.data) {
+        console.error("Backend error response:", error.response.data);
+        if (typeof error.response.data === "object") {
+          errorMessages = Object.entries(error.response.data).map(([field, messages]) => {
+            const fieldName = field
+              .replace(/_/g, " ")
+              .replace(/\b\w/g, (char) => char.toUpperCase());
+            return `${fieldName}: ${Array.isArray(messages) ? messages.join(", ") : messages}`;
+          });
+        } else {
+          errorMessages = [error.response.data.error || "Unknown server error"];
+        }
       } else {
         console.error("Error submitting form:", error);
+        errorMessages = ["Network error. Please check your connection and try again."];
       }
-      const errorMessage = axios.isAxiosError(error) ? error.response?.data?.error || "Unknown error" : "An unexpected error occurred";
-      alert("There was an error submitting the form: " + errorMessage);
+      setErrors(errorMessages);
     } finally {
       setLoading(false);
     }
@@ -237,14 +330,27 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
           >
             BLOOD DONATION FORM
           </motion.h2>
+          {errors.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6"
+            >
+              <p className="font-bold">Please correct the following errors:</p>
+              <ul className="list-disc list-inside">
+                {errors.map((error, index) => (
+                  <li key={index}>{error}</li>
+                ))}
+              </ul>
+            </motion.div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-6">
             <motion.div>
               <label className="block font-medium">First Name</label>
               <input
-                title="Input field"
                 type="text"
                 name="firstName"
-                value={String(formData.firstName ?? "")}
+                value={formData.firstName}
                 onChange={handleChange}
                 className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 transition"
                 required
@@ -254,10 +360,9 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
             <motion.div>
               <label className="block font-medium">Middle Name</label>
               <input
-                title="Input field"
                 type="text"
                 name="middleName"
-                value={String(formData.middleName ?? "")}
+                value={formData.middleName}
                 onChange={handleChange}
                 className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 transition"
                 placeholder="Enter your middle name"
@@ -266,10 +371,9 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
             <motion.div>
               <label className="block font-medium">Last Name</label>
               <input
-                title="Input field"
                 type="text"
                 name="lastName"
-                value={String(formData.lastName ?? "")}
+                value={formData.lastName}
                 onChange={handleChange}
                 className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 transition"
                 required
@@ -279,10 +383,9 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
             <motion.div>
               <label className="block font-medium">Address</label>
               <input
-                title="Input field"
                 type="text"
                 name="address"
-                value={String(formData.address ?? "")}
+                value={formData.address}
                 onChange={handleChange}
                 className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 transition"
                 required
@@ -292,14 +395,14 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
             <motion.div>
               <label className="block font-medium">Date of Birth</label>
               <input
+                placeholder="YYYY-MM-DD"
                 type="date"
                 name="dateOfBirth"
                 value={formData.dateOfBirth}
                 onChange={handleChange}
-                className="w-full p-3 border rounded-lg"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 transition"
                 required
-                title="Input field for date of birth"
-                placeholder="Select your date of birth"
+                max={new Date().toISOString().split("T")[0]} // Prevent future dates
               />
             </motion.div>
             <motion.div className="grid grid-cols-2 gap-4">
@@ -312,7 +415,6 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
                   onChange={handleChange}
                   className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 transition"
                   required
-                  title="Input field for phone number"
                   placeholder="Enter your phone number"
                 />
               </div>
@@ -324,9 +426,8 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
                   value={formData.email}
                   onChange={handleChange}
                   className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 transition"
-                  title="Input field for email"
-                  placeholder="Enter your email"
                   required
+                  placeholder="Enter your email"
                 />
               </div>
             </motion.div>
@@ -338,10 +439,10 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
                   name="age"
                   value={formData.age}
                   onChange={handleChange}
-                  className="w-full p-3 border rounded-lg"
+                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 transition"
                   required
-                  title="Input field for age"
                   placeholder="Enter your age"
+                  min="16"
                 />
               </div>
               <div>
@@ -351,10 +452,10 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
                   name="weight"
                   value={formData.weight}
                   onChange={handleChange}
-                  className="w-full p-3 border rounded-lg"
+                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 transition"
                   required
-                  title="Input field for weight"
                   placeholder="Enter your weight in lbs"
+                  min="110"
                 />
               </div>
               <div>
@@ -364,10 +465,8 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
                   name="gender"
                   value={formData.gender}
                   onChange={handleChange}
-                  className="w-full p-3 border rounded-lg"
+                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 transition"
                   required
-                  title="Select your gender"
-                  aria-labelledby="gender-label"
                 >
                   <option value="">Select Gender</option>
                   <option value="Male">Male</option>
@@ -382,10 +481,8 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
                   name="bloodType"
                   value={formData.bloodType}
                   onChange={handleChange}
-                  className="w-full p-3 border rounded-lg"
+                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 transition"
                   required
-                  title="Select your blood type"
-                  aria-labelledby="blood type-label"
                 >
                   <option value="">Select Blood Type</option>
                   {["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"].map((type) => (
@@ -397,16 +494,15 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
               </div>
             </motion.div>
             <motion.div>
-              <label className="block font-medium">Last Blood Donation Date</label>
+              <label className="block font-medium">Last Blood Donation Date (Optional)</label>
               <input
+                placeholder="YYYY-MM-DD"
                 type="date"
                 name="lastDonationDate"
                 value={formData.lastDonationDate}
                 onChange={handleChange}
-                className="w-full p-3 border rounded-lg"
-                required
-                title="Input field for last blood donation date"
-                placeholder="Select your last blood donation date"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 transition"
+                max={new Date().toISOString().split("T")[0]} // Prevent future dates
               />
             </motion.div>
             <motion.div>
@@ -461,6 +557,7 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
                   className="hidden"
                   required
                   title="Upload your identification card"
+                  placeholder="Upload your ID card"
                 />
                 <span className="ml-4 text-gray-600">{fileName || "No file selected"}</span>
               </div>
@@ -497,9 +594,34 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               type="submit"
-              className="w-full bg-red-500 text-white py-3 rounded-lg hover:bg-red-600 transition duration-300"
+              disabled={loading}
+              className={`w-full py-3 rounded-lg transition duration-300 flex items-center justify-center ${
+                loading ? "bg-red-400 cursor-not-allowed" : "bg-red-500 hover:bg-red-600 text-white"
+              }`}
             >
-              Submit
+              {loading && (
+                <svg
+                  className="animate-spin h-5 w-5 mr-3 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8z"
+                  ></path>
+                </svg>
+              )}
+              {loading ? "Submitting..." : "Submit"}
             </motion.button>
           </form>
         </motion.div>
