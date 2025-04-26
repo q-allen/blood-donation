@@ -153,7 +153,7 @@ export default function TransfusionOrderForm({ setError }: TransfusionOrderFormP
 
         <button
           type="submit"
-          className="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors"
+          className="bg-gradient-to-r from-red-600 to-red-800 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors"
         >
           Submit Order
         </button>
