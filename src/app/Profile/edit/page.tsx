@@ -203,7 +203,7 @@ const EditProfile: React.FC = () => {
         gender: response.data.user.gender || "",
         email: response.data.user.email || "",
       });
-      setTimeout(() => router.push("/profile"), 2000);
+      setTimeout(() => router.push("/Profile"), 2000);
     } catch (error) {
       let errorMessage = "Profile update failed. Please try again.";
       if (axios.isAxiosError(error) && error.response) {
@@ -534,7 +534,7 @@ const EditProfile: React.FC = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => router.push("/profile")}
+              onClick={() => router.push("/Profile")}
               className="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-md hover:bg-gray-100 transition font-medium"
             >
               Cancel
