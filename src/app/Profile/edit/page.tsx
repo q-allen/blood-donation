@@ -319,7 +319,7 @@ const EditProfile: React.FC = () => {
 
             {/* Right Side: Edit Form */}
             <div className="flex-1 mt-6 sm:mt-0">
-              <form onSubmit={updateProfile} className="space-y-4">
+              <form id="edit-profile-form" onSubmit={updateProfile} className="space-y-4">
                 <div className="flex items-center space-x-3">
                   <svg
                     className="w-5 h-5 text-gray-500"
@@ -345,7 +345,7 @@ const EditProfile: React.FC = () => {
                         whileFocus={{ scale: 1.02 }}
                         type="text"
                         className="w-full p-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500 text-gray-900"
-                        placeholder="First Name"
+                        placeholder={formData.first_name || "First Name"}
                         required
                       />
                       <motion.input
@@ -355,16 +355,16 @@ const EditProfile: React.FC = () => {
                         whileFocus={{ scale: 1.02 }}
                         type="text"
                         className="w-full p-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500 text-gray-900"
-                        placeholder="Middle Name"
+                        placeholder={formData.middle_name || "Middle Name"}
                       />
                       <motion.input
                         name="last_name"
-                        value={formData.first_name}
+                        value={formData.last_name}
                         onChange={handleChange}
                         whileFocus={{ scale: 1.02 }}
                         type="text"
                         className="w-full p-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500 text-gray-900"
-                        placeholder="Last Name"
+                        placeholder={formData.last_name || "Last Name"}
                         required
                       />
                     </div>
@@ -395,14 +395,14 @@ const EditProfile: React.FC = () => {
                       whileFocus={{ scale: 1.02 }}
                       type="email"
                       className="w-full p-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500 text-gray-900"
-                      placeholder="Email"
+                      placeholder={formData.email || "Email"}
                       required
                     />
                   </div>
                 </div>
 
                 <div className="flex items-center space-x-3">
-                  <svg
+                <svg
                     className="w-5 h-5 text-gray-500"
                     fill="none"
                     stroke="currentColor"
@@ -425,7 +425,7 @@ const EditProfile: React.FC = () => {
                       whileFocus={{ scale: 1.02 }}
                       type="text"
                       className="w-full p-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500 text-gray-900"
-                      placeholder="Contact"
+                      placeholder={formData.contact || "Contact"}
                       required
                     />
                   </div>
@@ -455,7 +455,7 @@ const EditProfile: React.FC = () => {
                       whileFocus={{ scale: 1.02 }}
                       type="text"
                       className="w-full p-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500 text-gray-900"
-                      placeholder="Username"
+                      placeholder={formData.username || "Username"}
                       required
                     />
                   </div>
@@ -485,7 +485,7 @@ const EditProfile: React.FC = () => {
                       whileFocus={{ scale: 1.02 }}
                       type="text"
                       className="w-full p-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500 text-gray-900"
-                      placeholder="Address"
+                      placeholder={formData.address || "Address"}
                       required
                     />
                   </div>
@@ -516,7 +516,9 @@ const EditProfile: React.FC = () => {
                       className="w-full p-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500 text-gray-900"
                       required
                     >
-                      <option value="">Select Gender</option>
+                      <option value="">
+                        {formData.gender || "Select Gender"}
+                      </option>
                       <option value="Male">Male</option>
                       <option value="Female">Female</option>
                       <option value="Other">Other</option>
