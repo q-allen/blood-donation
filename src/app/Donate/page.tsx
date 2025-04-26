@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import Header from "../../components/Header";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 import HeroCarousel from "../../components/HeroCarousel";
+import TransfusionOrderForm from "@/components/TransfusionOrderForm";
 import { FaTimes, FaExclamationCircle } from "react-icons/fa"; // Import icons
 
 interface Hospital {
@@ -21,6 +22,9 @@ export default function BloodDonationCenters() {
   const [centers, setCenters] = useState<Hospital[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const searchParams = useSearchParams(); // Get query parameters
+  const initialTab = searchParams.get("tab") === "request" ? "request" : "donate"; // Set initial tab based on query param
+  const [activeTab, setActiveTab] = useState<"donate" | "request">(initialTab); // State for tab switching
   const router = useRouter();
   const apiUrl = process.env.NEXT_PUBLIC_API_URL; // Update with your API URL
 
@@ -48,6 +52,14 @@ export default function BloodDonationCenters() {
 
     fetchHospitals();
   }, []);
+
+  // Update activeTab when the query parameter changes
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab === "request" || tab === "donate") {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
 
   const handleClick = (center: Hospital) => {
     if (!isAuthenticated()) {
@@ -111,56 +123,88 @@ export default function BloodDonationCenters() {
 
       <HeroCarousel />
 
-      {/* Centers Grid */}
-      <motion.div
-        className="max-w-8xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 p-10"
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-      >
-        {isLoading ? (
-          <p>Loading centers...</p>
-        ) : centers.length === 0 ? (
-          <p>No donation centers available.</p>
-        ) : (
-          centers.map((center, index) => (
-            <motion.div
-              key={center.id}
-              onClick={() => handleClick(center)}
-              className="bg-white p-6 rounded-xl shadow-xl cursor-pointer"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{
-                duration: 0.4,
-                ease: "easeOut",
-                delay: index * 0.1,
-              }}
-              whileHover={{
-                scale: 1.05,
-                boxShadow: "0px 10px 20px rgba(0, 0, 0, 0.2)",
-              }}
-            >
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
-              >
-                <Image
-                  src={center.image}
-                  alt={center.name}
-                  width={200}
-                  height={200}
-                  className="w-full h-64 object-contain rounded-lg"
-                />
-              </motion.div>
+      {/* Tab Navigation */}
+      <div className="max-w-8xl mx-auto mt-6">
+        <div className="flex justify-start space-x-4">
+          <button
+            onClick={() => {
+              setActiveTab("donate");
+              router.push("/Donate?tab=donate");
+            }}
+            className={`px-4 py-2 font-semibold ${
+              activeTab === "donate" ? "border-b-2 border-red-500 text-gray-900" : "text-gray-600"
+            }`}
+          >
+            Donate
+          </button>
+          <button
+            onClick={() => {
+              setActiveTab("request");
+              router.push("/Donate?tab=request");
+            }}
+            className={`px-4 py-2 font-semibold ${
+              activeTab === "request" ? "border-b-2 border-red-500 text-gray-900" : "text-gray-600"
+            }`}
+          >
+            Request Blood
+          </button>
+        </div>
+      </div>
 
-              <h2 className="text-xl font-semibold mt-4">{center.name}</h2>
-              <p className="text-gray-600 mt-2 text-sm line-clamp-2">{center.description}</p>
-              <p className="text-black text-sm font-semibold px-3 py-1">{center.location}</p>
-            </motion.div>
-          ))
-        )}
-      </motion.div>
+      {/* Tab Content */}
+      {activeTab === "donate" ? (
+        <motion.div
+          className="max-w-8xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 p-10"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+        >
+          {isLoading ? (
+            <p>Loading centers...</p>
+          ) : centers.length === 0 ? (
+            <p>No donation centers available.</p>
+          ) : (
+            centers.map((center, index) => (
+              <motion.div
+                key={center.id}
+                onClick={() => handleClick(center)}
+                className="bg-white p-6 rounded-xl shadow-xl cursor-pointer"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{
+                  duration: 0.4,
+                  ease: "easeOut",
+                  delay: index * 0.1,
+                }}
+                whileHover={{
+                  scale: 1.05,
+                  boxShadow: "0px 10px 20px rgba(0, 0, 0, 0.2)",
+                }}
+              >
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                >
+                  <Image
+                    src={center.image}
+                    alt={center.name}
+                    width={200}
+                    height={200}
+                    className="w-full h-64 object-contain rounded-lg"
+                  />
+                </motion.div>
+
+                <h2 className="text-xl font-semibold mt-4">{center.name}</h2>
+                <p className="text-gray-600 mt-2 text-sm line-clamp-2">{center.description}</p>
+                <p className="text-black text-sm font-semibold px-3 py-1">{center.location}</p>
+              </motion.div>
+            ))
+          )}
+        </motion.div>
+      ) : (
+        <TransfusionOrderForm setError={setError} />
+      )}
     </motion.main>
   );
 }
