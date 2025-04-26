@@ -5,6 +5,7 @@ import Image from "next/image";
 import Header from "@/components/Header"; // Ensure your navbar component is imported
 import HeroCarousel from "../components/HeroCarousel";
 import About from "../components/about";
+import Footer from "@/components/footer";
 import { useRouter } from "next/navigation";
 
   export default function Page() {
@@ -19,9 +20,11 @@ import { useRouter } from "next/navigation";
     className="bg-white text-gray-900 min-h-screen py-6 relative" // Set z-index to 0 for background
   >
     {/* Header */}
-    <div className="relative z-10"> {/* Header on top with higher z-index */}
-      <Header />
-    </div>
+    <header className="fixed top-0 left-0 w-full z-50 bg-white">
+      <div className="relative z-10"> {/* Header on top with higher z-index */}
+        <Header />
+      </div>
+    </header>
 
     {/* Main Content */}
     <div className="flex flex-col md:flex-row items-center px-10 relative z-0"> {/* Content stays behind */}
@@ -79,6 +82,11 @@ import { useRouter } from "next/navigation";
     </div>
   <HeroCarousel />
   <About />
+  <Footer />
+  {/* Footer */}
+    <div className="absolute bottom-0 left-0 w-full">
+      <Footer />
+    </div>
   </motion.div>
 );
 }

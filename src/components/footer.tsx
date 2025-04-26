@@ -23,12 +23,12 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/Donate" className="text-sm hover:underline">
+                <Link href="/Donate?tab=donate" className="text-sm hover:underline">
                   Become a Donor
                 </Link>
               </li>
               <li>
-                <Link href="/request" className="text-sm hover:underline">
+                <Link href="/Donate?tab=request" className="text-sm hover:underline">
                   Request Blood
                 </Link>
               </li>
@@ -52,7 +52,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="mt-8 pt-8 border-t border-red-500 text-center">
           <p className="text-sm">
-            &copy; {new Date().getFullYear()} Blood Donation System. All rights reserved.
+            © {new Date().getFullYear()} Blood Donation System. All rights reserved.
           </p>
         </div>
       </div>
