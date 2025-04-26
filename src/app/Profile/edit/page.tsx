@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 import Header from "@/components/Header";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 interface UserDetails {
@@ -63,10 +62,14 @@ const EditProfile: React.FC = () => {
       } catch (err) {
         if (axios.isAxiosError(err)) {
           console.error("Fetch User Failed:", err.response?.data || err.message);
+          setError(
+            err.response?.data?.detail ||
+              "Failed to load user data. Please try again."
+          );
         } else {
           console.error("Fetch User Failed:", err);
+          setError("An unexpected error occurred. Please try again.");
         }
-        setError("Failed to load user data. Please try again.");
       }
     };
     fetchUser();
@@ -79,6 +82,27 @@ const EditProfile: React.FC = () => {
     setError("");
     setSuccess("");
   };
+
+  // Optional: Token refresh logic (uncomment to enable)
+  /*
+  const refreshToken = async () => {
+    try {
+      const refresh = localStorage.getItem("refresh");
+      if (!refresh) throw new Error("No refresh token");
+      const response = await axios.post(`${apiUrl}/api/users/token/refresh/`, {
+        refresh,
+      });
+      localStorage.setItem("access", response.data.access);
+      return response.data.access;
+    } catch (err) {
+      localStorage.removeItem("access");
+      localStorage.removeItem("refresh");
+      setError("Session expired. Please log in again.");
+      setTimeout(() => router.push("/signin"), 2000);
+      throw err;
+    }
+  };
+  */
 
   const updateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -183,7 +207,41 @@ const EditProfile: React.FC = () => {
     } catch (error) {
       let errorMessage = "Profile update failed. Please try again.";
       if (axios.isAxiosError(error) && error.response) {
-        if (error.response.data) {
+        if (error.response.status === 401) {
+          // Optional: Uncomment to enable token refresh
+          /*
+          try {
+            const newToken = await refreshToken();
+            const response = await axios.patch(
+              `${apiUrl}/api/users/profile/`,
+              dataToSend,
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${newToken}`,
+                },
+                timeout: 5000,
+              }
+            );
+            setSuccess("Profile updated successfully!");
+            setFormData({
+              first_name: response.data.user.first_name || "",
+              middle_name: response.data.user.middle_name || "",
+              last_name: response.data.user.last_name || "",
+              username: response.data.user.username || "",
+              contact: response.data.user.contact || "",
+              gender: response.data.user.gender || "",
+              email: response.data.user.email || "",
+            });
+            setTimeout(() => router.push("/profile"), 2000);
+            return;
+          } catch (refreshError) {
+            errorMessage = "Session expired. Please log in again.";
+          }
+          */
+          errorMessage = "Session expired. Please log in again.";
+          setTimeout(() => router.push("/signin"), 2000);
+        } else if (error.response.data) {
           if (
             typeof error.response.data === "object" &&
             !error.response.data.detail
@@ -216,194 +274,306 @@ const EditProfile: React.FC = () => {
     }
   };
 
+  // Helper to get initials from first and last name
+  const getInitials = () => {
+    const firstInitial = formData.first_name ? formData.first_name[0] : "";
+    const lastInitial = formData.last_name ? formData.last_name[0] : "";
+    return `${firstInitial}${lastInitial}`.toUpperCase() || "JD";
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
-      className="bg-white text-red-900 min-h-screen px-10 py-6 relative"
+      className="bg-white text-gray-900 min-h-screen px-4 sm:px-6 lg:px-8 py-6"
     >
-      <div className="w-full flex flex-col bg-white text-red-900">
-        <Header />
-
+      <Header />
+      <div className="flex items-center justify-center py-12">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ scale: 0.95, y: 20 }}
+          animate={{ scale: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="flex flex-1 items-center justify-center min-h-screen px-4"
+          className="bg-white rounded-lg shadow-lg w-full max-w-4xl p-6 sm:p-8"
         >
-          <motion.div
-            initial={{ scale: 0.9 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="bg-white w-full max-w-3xl flex rounded-lg shadow-xl overflow-hidden"
-          >
-            <motion.div
-              initial={{ x: -50, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ duration: 0.7 }}
-              className="hidden md:flex flex-col justify-center flex-1 px-12 bg-gradient-to-r from-red-600 to-red-800 text-white"
-            >
-              <h1 className="text-4xl font-bold">UPDATE YOUR PROFILE</h1>
-              <p className="text-lg mt-2">Keep your information current</p>
-              <p className="text-sm mt-4">
-                Ensure your details are up to date to stay connected with our blood donation community.
-              </p>
-            </motion.div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">My Profile</h2>
+          <p className="text-sm text-gray-500 mb-6">
+            View and update your profile information
+          </p>
 
-            <motion.div
-              initial={{ x: 50, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ duration: 0.7 }}
-              className="flex-1 p-8 md:p-12"
-            >
-              <h2 className="text-2xl font-bold text-red-700">Edit Profile</h2>
-              <p className="text-sm text-red-500 mt-1">Update your details below</p>
-              {error && <p className="text-red-500 text-center text-sm mt-2">{error}</p>}
-              {success && <p className="text-green-500 text-center text-sm mt-2">{success}</p>}
-              <form className="mt-4 space-y-2" onSubmit={updateProfile}>
-                <div className="grid grid-cols-2 gap-2">
-                  <motion.input
-                    name="first_name"
-                    value={formData.first_name}
-                    onChange={handleChange}
-                    whileFocus={{ scale: 1.05 }}
-                    type="text"
-                    className="w-full p-2 border rounded bg-red-50 text-red-700 text-sm"
-                    placeholder="First Name"
-                    required
-                  />
-                  <motion.input
-                    name="middle_name"
-                    value={formData.middle_name}
-                    onChange={handleChange}
-                    whileFocus={{ scale: 1.05 }}
-                    type="text"
-                    className="w-full p-2 border rounded bg-red-50 text-red-700 text-sm"
-                    placeholder="Middle Name"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <motion.input
-                    name="last_name"
-                    value={formData.last_name}
-                    onChange={handleChange}
-                    whileFocus={{ scale: 1.05 }}
-                    type="text"
-                    className="w-full p-2 border rounded bg-red-50 text-red-700 text-sm"
-                    placeholder="Last Name"
-                    required
-                  />
-                  <motion.input
-                    name="username"
-                    value={formData.username}
-                    onChange={handleChange}
-                    whileFocus={{ scale: 1.05 }}
-                    type="text"
-                    className="w-full p-2 border rounded bg-red-50 text-red-700 text-sm"
-                    placeholder="Username"
-                    required
-                  />
-                </div>
-                <motion.input
-                  name="contact"
-                  value={formData.contact}
-                  onChange={handleChange}
-                  whileFocus={{ scale: 1.05 }}
-                  type="text"
-                  className="w-full p-2 border rounded bg-red-50 text-red-700 text-sm"
-                  placeholder="Contact"
-                  required
-                />
-                <motion.input
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  whileFocus={{ scale: 1.05 }}
-                  type="email"
-                  className="w-full p-2 border rounded bg-red-50 text-red-700 text-sm"
-                  placeholder="Email"
-                  required
-                />
-                <motion.input
-                  name="address"
-                  value={formData.address}
-                  onChange={handleChange}
-                  whileFocus={{ scale: 1.05 }}
-                  type="text"
-                  className="w-full p-2 border rounded bg-red-50 text-red-700 text-sm"
-                  placeholder="Address"
-                  required
-                />
-                <motion.select
-                  name="gender"
-                  value={formData.gender}
-                  onChange={handleChange}
-                  whileFocus={{ scale: 1.05 }}
-                  className="w-full p-2 border rounded bg-red-50 text-red-700 text-sm"
-                  required
-                >
-                  <option value="">Select Gender</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
-                </motion.select>
-                <div className="flex justify-end space-x-3 mt-4">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    type="button"
-                    onClick={() => router.push("/profile")}
-                    className="px-4 py-2 bg-white text-red-700 border border-red-300 rounded-lg hover:bg-red-50 transition font-medium"
+          {error && (
+            <p className="text-red-500 text-center text-sm mb-4">{error}</p>
+          )}
+          {success && (
+            <p className="text-green-500 text-center text-sm mb-4">{success}</p>
+          )}
+
+          <div className="flex flex-col sm:flex-row sm:space-x-6">
+            {/* Left Side: Avatar */}
+            <div className="flex flex-col items-center sm:items-start">
+              <div className="w-24 h-24 rounded-full bg-red-100 flex items-center justify-center text-red-600 text-2xl font-semibold mb-4">
+                {getInitials()}
+              </div>
+            </div>
+
+            {/* Right Side: Edit Form */}
+            <div className="flex-1 mt-6 sm:mt-0">
+              <form onSubmit={updateProfile} className="space-y-4">
+                <div className="flex items-center space-x-3">
+                  <svg
+                    className="w-5 h-5 text-gray-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
                   >
-                    Cancel
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: loading ? 1 : 1.05 }}
-                    whileTap={{ scale: loading ? 1 : 0.95 }}
-                    type="submit"
-                    disabled={loading}
-                    className={`px-4 py-2 rounded-lg transition font-medium flex items-center justify-center space-x-2 ${
-                      loading
-                        ? "bg-red-400 cursor-not-allowed"
-                        : "bg-gradient-to-r from-red-600 to-red-800 text-white hover:bg-red-700"
-                    }`}
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    ></path>
+                  </svg>
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-500">Name</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <motion.input
+                        name="first_name"
+                        value={formData.first_name}
+                        onChange={handleChange}
+                        whileFocus={{ scale: 1.02 }}
+                        type="text"
+                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500 text-gray-900"
+                        placeholder="First Name"
+                        required
+                      />
+                      <motion.input
+                        name="middle_name"
+                        value={formData.middle_name}
+                        onChange={handleChange}
+                        whileFocus={{ scale: 1.02 }}
+                        type="text"
+                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500 text-gray-900"
+                        placeholder="Middle Name"
+                      />
+                      <motion.input
+                        name="last_name"
+                        value={formData.first_name}
+                        onChange={handleChange}
+                        whileFocus={{ scale: 1.02 }}
+                        type="text"
+                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500 text-gray-900"
+                        placeholder="Last Name"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-3">
+                  <svg
+                    className="w-5 h-5 text-gray-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
                   >
-                    {loading && (
-                      <svg
-                        className="animate-spin h-4 w-4 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        ></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8v8z"
-                        ></path>
-                      </svg>
-                    )}
-                    <span>{loading ? "Saving..." : "Save Changes"}</span>
-                  </motion.button>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    ></path>
+                  </svg>
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-500">Email</p>
+                    <motion.input
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      whileFocus={{ scale: 1.02 }}
+                      type="email"
+                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500 text-gray-900"
+                      placeholder="Email"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-3">
+                  <svg
+                    className="w-5 h-5 text-gray-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                    ></path>
+                  </svg>
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-500">Phone Number</p>
+                    <motion.input
+                      name="contact"
+                      value={formData.contact}
+                      onChange={handleChange}
+                      whileFocus={{ scale: 1.02 }}
+                      type="text"
+                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500 text-gray-900"
+                      placeholder="Contact"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-3">
+                  <svg
+                    className="w-5 h-5 text-gray-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M17.657 16.243l-4.243-4.243m0 0L9.172 7.757m4.242 4.243L9.172 16.243m4.242-4.243L17.657 7.757"
+                    ></path>
+                  </svg>
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-500">Username</p>
+                    <motion.input
+                      name="username"
+                      value={formData.username}
+                      onChange={handleChange}
+                      whileFocus={{ scale: 1.02 }}
+                      type="text"
+                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500 text-gray-900"
+                      placeholder="Username"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-3">
+                  <svg
+                    className="w-5 h-5 text-gray-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M17.657 16.243l-4.243-4.243m0 0L9.172 7.757m4.242 4.243L9.172 16.243m4.242-4.243L17.657 7.757"
+                    ></path>
+                  </svg>
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-500">Address</p>
+                    <motion.input
+                      name="address"
+                      value={formData.address}
+                      onChange={handleChange}
+                      whileFocus={{ scale: 1.02 }}
+                      type="text"
+                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500 text-gray-900"
+                      placeholder="Address"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-3">
+                  <svg
+                    className="w-5 h-5 text-gray-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    ></path>
+                  </svg>
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-500">Gender</p>
+                    <motion.select
+                      name="gender"
+                      value={formData.gender}
+                      onChange={handleChange}
+                      whileFocus={{ scale: 1.02 }}
+                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500 text-gray-900"
+                      required
+                    >
+                      <option value="">Select Gender</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </motion.select>
+                  </div>
                 </div>
               </form>
-              <p className="text-center text-black text-xs mt-2">
-                Back to{" "}
-                <Link href="/profile" className="text-red-700 hover:underline">
-                  Profile
-                </Link>
-              </p>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
+
+          {/* Buttons */}
+          <div className="flex justify-end space-x-3 mt-6">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => router.push("/profile")}
+              className="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-md hover:bg-gray-100 transition font-medium"
+            >
+              Cancel
+            </motion.button>
+            <motion.button
+              type="submit"
+              form="edit-profile-form"
+              disabled={loading}
+              whileHover={{ scale: loading ? 1 : 1.05 }}
+              whileTap={{ scale: loading ? 1 : 0.95 }}
+              className={`px-4 py-2 rounded-md transition font-medium flex items-center justify-center space-x-2 ${
+                loading
+                  ? "bg-red-400 cursor-not-allowed"
+                  : "bg-red-600 hover:bg-red-700 text-white"
+              }`}
+            >
+              {loading && (
+                <svg
+                  className="animate-spin h-4 w-4 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8z"
+                  ></path>
+                </svg>
+              )}
+              <span>{loading ? "Saving..." : "Save Changes"}</span>
+            </motion.button>
+          </div>
         </motion.div>
       </div>
     </motion.div>
