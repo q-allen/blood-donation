@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import Header from "../../components/Header";
@@ -8,7 +8,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 import HeroCarousel from "../../components/HeroCarousel";
 import TransfusionOrderForm from "@/components/TransfusionOrderForm";
-import { FaTimes, FaExclamationCircle } from "react-icons/fa"; // Import icons
+import { FaTimes, FaExclamationCircle } from "react-icons/fa";
 
 interface Hospital {
   id: number;
@@ -18,20 +18,20 @@ interface Hospital {
   image: string;
 }
 
-export default function BloodDonationCenters() {
+// Separate component to handle useSearchParams
+function BloodDonationCentersContent() {
+  const searchParams = useSearchParams();
+  const initialTab = searchParams.get("tab") === "request" ? "request" : "donate";
+  const [activeTab, setActiveTab] = useState<"donate" | "request">(initialTab);
   const [centers, setCenters] = useState<Hospital[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const searchParams = useSearchParams(); // Get query parameters
-  const initialTab = searchParams.get("tab") === "request" ? "request" : "donate"; // Set initial tab based on query param
-  const [activeTab, setActiveTab] = useState<"donate" | "request">(initialTab); // State for tab switching
   const router = useRouter();
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL; // Update with your API URL
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   // Check if user is authenticated
   const isAuthenticated = () => {
     const token = localStorage.getItem("access");
-    
     return !!token;
   };
 
@@ -51,9 +51,9 @@ export default function BloodDonationCenters() {
     };
 
     fetchHospitals();
-  }, []);
+  }, [apiUrl]); // Added apiUrl as dependency
 
-  // Update activeTab when the query parameter changes
+  // Update activeTab when query parameter changes
   useEffect(() => {
     const tab = searchParams.get("tab");
     if (tab === "request" || tab === "donate") {
@@ -82,7 +82,6 @@ export default function BloodDonationCenters() {
     router.push(`/DonateForm?${query}`);
   };
 
-  // Clear error message
   const clearError = () => {
     setError(null);
   };
@@ -98,7 +97,6 @@ export default function BloodDonationCenters() {
         <Header />
       </div>
 
-      {/* Enhanced Error Message */}
       {error && (
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -123,7 +121,6 @@ export default function BloodDonationCenters() {
 
       <HeroCarousel />
 
-      {/* Tab Navigation */}
       <div className="max-w-8xl mx-auto mt-6">
         <div className="flex justify-start space-x-4">
           <button
@@ -151,7 +148,6 @@ export default function BloodDonationCenters() {
         </div>
       </div>
 
-      {/* Tab Content */}
       {activeTab === "donate" ? (
         <motion.div
           className="max-w-8xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 p-10"
@@ -206,5 +202,13 @@ export default function BloodDonationCenters() {
         <TransfusionOrderForm setError={setError} />
       )}
     </motion.main>
+  );
+}
+
+export default function BloodDonationCenters() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <BloodDonationCentersContent />
+    </Suspense>
   );
 }
