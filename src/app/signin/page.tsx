@@ -24,7 +24,9 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
   const router = useRouter();
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, ""); // Remove trailing slash
+
+  console.log("API URL:", apiUrl); // Debug API URL
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +40,8 @@ export default function LoginPage() {
     }
 
     try {
-      const res = await axios.post(`${apiUrl}'api/users/signin/`, {
+      console.log("Sending POST request to:", `${apiUrl}/api/users/signin/`);
+      const res = await axios.post(`${apiUrl}/api/users/signin/`, {
         email,
         password,
       });
@@ -48,9 +51,15 @@ export default function LoginPage() {
       router.push("/");
     } catch (err) {
       if (axios.isAxiosError(err) && err.response) {
-        setError(err.response.data.error || "Invalid email or password.");
+        if (err.response.status === 401) {
+          setError("Invalid email or password. Please try again.");
+        } else if (err.response.data.error) {
+          setError(err.response.data.error);
+        } else {
+          setError("An error occurred. Please try again later.");
+        }
       } else {
-        setError("Something went wrong. Please try again.");
+        setError("Network error. Please check your connection.");
       }
       setLoading(false);
     }
@@ -157,7 +166,7 @@ export default function LoginPage() {
               </motion.button>
 
               <p className="text-center text-black text-sm mt-4">
-                Don&apos;t have an account?{" "}
+                Don't have an account?{" "}
                 <Link href="/signup" className="text-red-700 hover:underline">
                   Sign up
                 </Link>
