@@ -18,6 +18,7 @@ export default function Header() {
   const [users, setUser] = useState<Users | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, ""); // Remove trailing slash
   const router = useRouter();
 
   useEffect(() => {
@@ -32,7 +33,7 @@ export default function Header() {
       }
 
       try {
-        const res = await axios.get("http://localhost:8000/api/users/profile/", {
+        const res = await axios.get(`${apiUrl}/api/users/profile/`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
