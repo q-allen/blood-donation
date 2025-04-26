@@ -547,8 +547,8 @@ const EditProfile: React.FC = () => {
               whileTap={{ scale: loading ? 1 : 0.95 }}
               className={`px-4 py-2 rounded-md transition font-medium flex items-center justify-center space-x-2 ${
                 loading
-                  ? "bg-gradient-to-r from-red-600 to-red-800 cursor-not-allowed"
-                  : "bg-red-600 hover:bg-red-700 text-white"
+                  ? "bg-red-400 cursor-not-allowed"
+                  : "bg-red-600 hover:bg-gradient-to-r from-red-600 to-red-800 text-white"
               }`}
             >
               {loading && (
