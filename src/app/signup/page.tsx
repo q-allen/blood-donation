@@ -23,7 +23,9 @@ const SignupPage: React.FC = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, ""); // Remove trailing slash
+
+  console.log("API URL:", apiUrl); // Debug API URL
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -86,8 +88,21 @@ const SignupPage: React.FC = () => {
       return;
     }
 
+    console.log("Sending POST request to:", `${apiUrl}/api/users/register/`);
+    console.log("Payload:", {
+      first_name: formData.first_name,
+      middle_name: formData.middle_name,
+      last_name: formData.last_name,
+      username: formData.username,
+      contact: formData.contact,
+      address: formData.address,
+      gender: formData.gender,
+      email: formData.email,
+      password: formData.password,
+    });
+
     try {
-      const response = await axios.post(`${apiUrl}api/users/register`, {
+      const response = await axios.post(`${apiUrl}/api/users/register/`, {
         first_name: formData.first_name,
         middle_name: formData.middle_name,
         last_name: formData.last_name,
@@ -118,7 +133,9 @@ const SignupPage: React.FC = () => {
     } catch (error) {
       let errorMessage = "Registration failed. Please try again.";
       if (axios.isAxiosError(error) && error.response) {
-        if (error.response.data) {
+        if (error.response.status === 405) {
+          errorMessage = "Invalid request method. Please contact support.";
+        } else if (error.response.data) {
           if (typeof error.response.data === "object" && !error.response.data.detail) {
             errorMessage = Object.entries(error.response.data)
               .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(", ") : value}`)
@@ -154,67 +171,165 @@ const SignupPage: React.FC = () => {
       <div className="w-full flex flex-col bg-white text-red-900">
         <Header />
 
-        <motion.div 
-            initial={{ opacity: 0, y: 20 }} 
-            animate={{ opacity: 1, y: 0 }} 
-            transition={{ duration: 0.5 }}
-            className="flex flex-1 items-center justify-center min-h-screen px-4"
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="flex flex-1 items-center justify-center min-h-screen px-4"
         >
-            <motion.div 
-                initial={{ scale: 0.9 }} 
-                animate={{ scale: 1 }} 
-                transition={{ duration: 0.5 }}
-                className="bg-white w-full max-w-3xl flex rounded-lg shadow-xl overflow-hidden"
+          <motion.div
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="bg-white w-full max-w-3xl flex rounded-lg shadow-xl overflow-hidden"
+          >
+            <motion.div
+              initial={{ x: -50, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.7 }}
+              className="hidden md:flex flex-col justify-center flex-1 px-12 bg-gradient-to-r from-red-600 to-red-800 text-white"
             >
-                <motion.div 
-                    initial={{ x: -50, opacity: 0 }} 
-                    animate={{ x: 0, opacity: 1 }} 
-                    transition={{ duration: 0.7 }}
-                    className="hidden md:flex flex-col justify-center flex-1 px-12 bg-gradient-to-r from-red-600 to-red-800 text-white"
-                >
-                    <h1 className="text-4xl font-bold">DONATE BLOOD, SAVE LIVES</h1>
-                    <p className="text-lg mt-2">Every drop counts</p>
-                    <p className="text-sm mt-4">
-                        Join our community of blood donors and make a difference today.
-                    </p>
-                </motion.div>
-
-                <motion.div 
-                    initial={{ x: 50, opacity: 0 }} 
-                    animate={{ x: 0, opacity: 1 }} 
-                    transition={{ duration: 0.7 }}
-                    className="flex-1 p-8 md:p-12"
-                >
-                    <h2 className="text-2xl font-bold text-red-700">Join as a Blood Donor</h2>
-                    <p className="text-sm text-red-500 mt-1">Enter your details below</p>
-                    {error && <p className="text-red-500 text-center text-sm mt-2">{error}</p>}
-                    <form className="mt-4 space-y-2" onSubmit={registerUser}>
-                        <div className="grid grid-cols-2 gap-2">
-                            <motion.input name="first_name" value={formData.first_name} onChange={handleChange} whileFocus={{ scale: 1.05 }} type="text" className="w-full p-2 border rounded bg-red-50 text-red-700 text-sm" placeholder="First Name" required />
-                            <motion.input name="middle_name" value={formData.middle_name} onChange={handleChange} whileFocus={{ scale: 1.05 }} type="text" className="w-full p-2 border rounded bg-red-50 text-red-700 text-sm" placeholder="Middle Name" />
-                        </div>
-                        <div className="grid grid-cols-2 gap-2">
-                            <motion.input name="last_name" value={formData.last_name} onChange={handleChange} whileFocus={{ scale: 1.05 }} type="text" className="w-full p-2 border rounded bg-red-50 text-red-700 text-sm" placeholder="Last Name" required />
-                            <motion.input name="username" value={formData.username} onChange={handleChange} whileFocus={{ scale: 1.05 }} type="text" className="w-full p-2 border rounded bg-red-50 text-red-700 text-sm" placeholder="Username" required />
-                        </div>
-                        <motion.input name="contact" value={formData.contact} onChange={handleChange} whileFocus={{ scale: 1.05 }} type="text" className="w-full p-2 border rounded bg-red-50 text-red-700 text-sm" placeholder="Contact" required />
-                        <motion.input name="email" value={formData.email} onChange={handleChange} whileFocus={{ scale: 1.05 }} type="email" className="w-full p-2 border rounded bg-red-50 text-red-700 text-sm" placeholder="Email" required />
-                        <motion.input name="address" value={formData.address} onChange={handleChange} whileFocus={{ scale: 1.05 }} type="text" className="w-full p-2 border rounded bg-red-50 text-red-700 text-sm" placeholder="Address" required />
-                        <motion.select name="gender" value={formData.gender} onChange={handleChange} whileFocus={{ scale: 1.05 }} className="w-full p-2 border rounded bg-red-50 text-red-700 text-sm" required>
-                            <option value="">Select Gender</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Other">Other</option>
-                        </motion.select>
-                        <motion.input name="password" value={formData.password} onChange={handleChange} whileFocus={{ scale: 1.05 }} type="password" className="w-full p-2 border rounded bg-red-50 text-red-700 text-sm" placeholder="Password" required />
-                        <motion.input name="confirm_password" value={formData.confirm_password} onChange={handleChange} whileFocus={{ scale: 1.05 }} type="password" className="w-full p-2 border rounded bg-red-50 text-red-700 text-sm" placeholder="Confirm Password" required />
-                        <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} type="submit" disabled={loading} className="w-full bg-gradient-to-r from-red-600 to-red-800 text-white font-semibold py-2 rounded-lg mt-2 hover:bg-red-700 transition">
-                          {loading ? "Signing Up..." : "Sign Up"}
-                        </motion.button>
-                        <p className="text-center text-black text-xs mt-2">Already have an account? <Link href="/signin" className="text-red-700 hover:underline">Sign In</Link></p>
-                    </form>
-                </motion.div>
+              <h1 className="text-4xl font-bold">DONATE BLOOD, SAVE LIVES</h1>
+              <p className="text-lg mt-2">Every drop counts</p>
+              <p className="text-sm mt-4">
+                Join our community of blood donors and make a difference today.
+              </p>
             </motion.div>
+
+            <motion.div
+              initial={{ x: 50, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.7 }}
+              className="flex-1 p-8 md:p-12"
+            >
+              <h2 className="text-2xl font-bold text-red-700">Join as a Blood Donor</h2>
+              <p className="text-sm text-red-500 mt-1">Enter your details below</p>
+              {error && <p className="text-red-500 text-center text-sm mt-2">{error}</p>}
+              <form className="mt-4 space-y-2" onSubmit={registerUser}>
+                <div className="grid grid-cols-2 gap-2">
+                  <motion.input
+                    name="first_name"
+                    value={formData.first_name}
+                    onChange={handleChange}
+                    whileFocus={{ scale: 1.05 }}
+                    type="text"
+                    className="w-full p-2 border rounded bg-red-50 text-red-700 text-sm"
+                    placeholder="First Name"
+                    required
+                  />
+                  <motion.input
+                    name="middle_name"
+                    value={formData.middle_name}
+                    onChange={handleChange}
+                    whileFocus={{ scale: 1.05 }}
+                    type="text"
+                    className="w-full p-2 border rounded bg-red-50 text-red-700 text-sm"
+                    placeholder="Middle Name"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <motion.input
+                    name="last_name"
+                    value={formData.last_name}
+                    onChange={handleChange}
+                    whileFocus={{ scale: 1.05 }}
+                    type="text"
+                    className="w-full p-2 border rounded bg-red-50 text-red-700 text-sm"
+                    placeholder="Last Name"
+                    required
+                  />
+                  <motion.input
+                    name="username"
+                    value={formData.username}
+                    onChange={handleChange}
+                    whileFocus={{ scale: 1.05 }}
+                    type="text"
+                    className="w-full p-2 border rounded bg-red-50 text-red-700 text-sm"
+                    placeholder="Username"
+                    required
+                  />
+                </div>
+                <motion.input
+                  name="contact"
+                  value={formData.contact}
+                  onChange={handleChange}
+                  whileFocus={{ scale: 1.05 }}
+                  type="text"
+                  className="w-full p-2 border rounded bg-red-50 text-red-700 text-sm"
+                  placeholder="Contact"
+                  required
+                />
+                <motion.input
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  whileFocus={{ scale: 1.05 }}
+                  type="email"
+                  className="w-full p-2 border rounded bg-red-50 text-red-700 text-sm"
+                  placeholder="Email"
+                  required
+                />
+                <motion.input
+                  name="address"
+                  value={formData.address}
+                  onChange={handleChange}
+                  whileFocus={{ scale: 1.05 }}
+                  type="text"
+                  className="w-full p-2 border rounded bg-red-50 text-red-700 text-sm"
+                  placeholder="Address"
+                  required
+                />
+                <motion.select
+                  name="gender"
+                  value={formData.gender}
+                  onChange={handleChange}
+                  whileFocus={{ scale: 1.05 }}
+                  className="w-full p-2 border rounded bg-red-50 text-red-700 text-sm"
+                  required
+                >
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </motion.select>
+                <motion.input
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  whileFocus={{ scale: 1.05 }}
+                  type="password"
+                  className="w-full p-2 border rounded bg-red-50 text-red-700 text-sm"
+                  placeholder="Password"
+                  required
+                />
+                <motion.input
+                  name="confirm_password"
+                  value={formData.confirm_password}
+                  onChange={handleChange}
+                  whileFocus={{ scale: 1.05 }}
+                  type="password"
+                  className="w-full p-2 border rounded bg-red-50 text-red-700 text-sm"
+                  placeholder="Confirm Password"
+                  required
+                />
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-gradient-to-r from-red-600 to-red-800 text-white font-semibold py-2 rounded-lg mt-2 hover:bg-red-700 transition"
+                >
+                  {loading ? "Signing Up..." : "Sign Up"}
+                </motion.button>
+                <p className="text-center text-black text-xs mt-2">
+                  Already have an account?{" "}
+                  <Link href="/signin" className="text-red-700 hover:underline">
+                    Sign In
+                  </Link>
+                </p>
+              </form>
+            </motion.div>
+          </motion.div>
         </motion.div>
       </div>
     </motion.div>
