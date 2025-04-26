@@ -29,6 +29,7 @@ const ProfileEditPopup: React.FC = () => {
     email: "",
   });
   const [error, setError] = useState("");
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, ""); // Remove trailing slash
   const router = useRouter();
 
   useEffect(() => {
@@ -42,7 +43,7 @@ const ProfileEditPopup: React.FC = () => {
       }
 
       try {
-        const res = await axios.get("http://localhost:8000/api/users/profile/", {
+        const res = await axios.get(`${apiUrl}/api/users/profile/`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setFormData({
