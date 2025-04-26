@@ -44,7 +44,7 @@ const EditProfile: React.FC = () => {
       }
 
       try {
-        const res = await axios.get(`${apiUrl}/api/users/profile/`, {
+        const res = await axios.patch(`${apiUrl}/api/users/profile/`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setFormData({
