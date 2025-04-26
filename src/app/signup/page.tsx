@@ -23,6 +23,7 @@ const SignupPage: React.FC = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -85,22 +86,35 @@ const SignupPage: React.FC = () => {
       return;
     }
 
-
     try {
-      alert("Registration successful!");
-      setFormData({
-        first_name: "",
-        middle_name: "",
-        last_name: "",
-        username: "",
-        contact: "",
-        address: "",
-        gender: "",
-        email: "",
-        password: "",
-        confirm_password: "",
+      const response = await axios.post(`${apiUrl}api/users/register`, {
+        first_name: formData.first_name,
+        middle_name: formData.middle_name,
+        last_name: formData.last_name,
+        username: formData.username,
+        contact: formData.contact,
+        address: formData.address,
+        gender: formData.gender,
+        email: formData.email,
+        password: formData.password,
       });
-      router.push("/signin");
+
+      if (response.status === 201 || response.status === 200) {
+        alert("Registration successful!");
+        setFormData({
+          first_name: "",
+          middle_name: "",
+          last_name: "",
+          username: "",
+          contact: "",
+          address: "",
+          gender: "",
+          email: "",
+          password: "",
+          confirm_password: "",
+        });
+        router.push("/signin");
+      }
     } catch (error) {
       let errorMessage = "Registration failed. Please try again.";
       if (axios.isAxiosError(error) && error.response) {

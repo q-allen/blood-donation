@@ -49,6 +49,7 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
   const [, setLoading] = useState(false);
   const [fileName, setFileName] = useState<string | null>(null);
   const controls = useAnimation();
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL; // Update with your API URL
 
   useEffect(() => {
     const handleScroll = () => {
@@ -163,8 +164,8 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
     setLoading(true);
 
     try {
-      console.log("Data being sent:", Object.fromEntries(formDataToSubmit));
-      const response = await axios.post("http://127.0.0.1:8000/api/blood_donation/", formDataToSubmit, {
+      
+      const response = await axios.post(`${apiUrl}api/blood_donation/`, formDataToSubmit, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

@@ -27,7 +27,7 @@ export default function BloodDonationCenters() {
   // Check if user is authenticated
   const isAuthenticated = () => {
     const token = localStorage.getItem("access");
-    console.log("Checking access token:", token);
+    
     return !!token;
   };
 
@@ -36,7 +36,7 @@ export default function BloodDonationCenters() {
     const fetchHospitals = async () => {
       try {
         setIsLoading(true);
-        const response = await axios.get(`${apiUrl}/api/hospitals/`);
+        const response = await axios.get(`${apiUrl}api/hospitals/`);
         setCenters(response.data);
       } catch (error) {
         console.error("Error fetching hospitals:", error);
