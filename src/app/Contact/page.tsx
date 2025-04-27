@@ -15,11 +15,10 @@ const ContactUs = () => {
     >
       {/* Header */}
       <header className="fixed top-0 left-0 w-full z-50 bg-white">
-        <div className="relative z-10">
+        <div className="relative z-10"> {/* Header on top with higher z-index */}
           <Header />
         </div>
       </header>
-
       <div className="min-h-screen flex flex-col items-center justify-center bg-white">
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
@@ -83,8 +82,9 @@ const ContactUs = () => {
           </motion.div>
         </motion.div>
       </div>
+      <Footer />
       {/* Footer */}
-      <div className="sticky bottom-0 left-0 w-full">
+      <div className="absolute bottom-0 left-0 w-full">
         <Footer />
       </div>
     </motion.div>
