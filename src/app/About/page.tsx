@@ -3,7 +3,6 @@
 import React from "react";
 import { motion } from "framer-motion";
 import Header from "../../components/Header";
-import Footer from "@/components/footer";
 import Image from "next/image";
 
 const About: React.FC = () => {
@@ -82,11 +81,6 @@ const About: React.FC = () => {
           </p>
         </motion.div>
       </div>
-      <Footer />
-      {/* Footer */}
-        <div className="absolute bottom-0 left-0 w-full">
-          <Footer />
-        </div>
     </motion.div>
   );
 };
