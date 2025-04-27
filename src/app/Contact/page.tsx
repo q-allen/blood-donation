@@ -2,6 +2,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import Header from "../../components/Header";
+import Footer from "@/components/footer";
 
 const ContactUs = () => {
   return (
@@ -77,6 +78,11 @@ const ContactUs = () => {
           </motion.div>
         </motion.div>
       </div>
+      <Footer />
+      {/* Footer */}
+        <div className="absolute bottom-0 left-0 w-full">
+          <Footer />
+        </div>
     </motion.div>
   );
 };

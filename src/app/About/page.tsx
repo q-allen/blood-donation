@@ -3,6 +3,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import Header from "../../components/Header";
+import Footer from "@/components/footer";
 import Image from "next/image";
 
 const About: React.FC = () => {
@@ -38,7 +39,13 @@ const About: React.FC = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <Header />
+      {/* Header */}
+      <header className="fixed top-0 left-0 w-full z-50 bg-white">
+        <div className="relative z-10"> {/* Header on top with higher z-index */}
+          <Header />
+        </div>
+      </header>
+
       <div className="flex flex-col md:flex-row items-center max-w-6xl mx-auto p-6 md:p-12">
         <motion.div
           className="w-full md:w-1/2 relative"
@@ -75,6 +82,11 @@ const About: React.FC = () => {
           </p>
         </motion.div>
       </div>
+      <Footer />
+      {/* Footer */}
+        <div className="absolute bottom-0 left-0 w-full">
+          <Footer />
+        </div>
     </motion.div>
   );
 };
