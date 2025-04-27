@@ -7,6 +7,7 @@ import Header from "../../components/Header";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 import HeroCarousel from "../../components/HeroCarousel";
+import Footer from "@/components/footer";
 import TransfusionOrderForm from "@/components/TransfusionOrderForm";
 import { FaTimes, FaExclamationCircle } from "react-icons/fa";
 
@@ -93,9 +94,12 @@ function BloodDonationCentersContent() {
       transition={{ duration: 0.6, ease: "easeOut" }}
       className="bg-white text-gray-900 min-h-screen py-6 relative"
     >
-      <div className="relative z-10">
-        <Header />
-      </div>
+      {/* Header */}
+      <header className="fixed top-0 left-0 w-full z-50 bg-white">
+        <div className="relative z-10"> {/* Header on top with higher z-index */}
+          <Header />
+        </div>
+      </header>
 
       {error && (
         <motion.div
@@ -201,6 +205,11 @@ function BloodDonationCentersContent() {
       ) : (
         <TransfusionOrderForm setError={setError} />
       )}
+      <Footer />
+      {/* Footer */}
+        <div className="absolute bottom-0 left-0 w-full">
+          <Footer />
+        </div>
     </motion.main>
   );
 }
