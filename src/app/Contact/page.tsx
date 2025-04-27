@@ -11,13 +11,16 @@ const ContactUs = () => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
-      className="bg-white text-gray-900 min-h-screen px-4 sm:px-6 md:px-10 py-6 flex flex-col"
+      className="bg-white text-gray-900 min-h-screen px-4 sm:px-6 md:px-10 py-6 relative"
     >
       {/* Header */}
-      <Header />
+      <header className="fixed top-0 left-0 w-full z-50 bg-white">
+        <div className="relative z-10">
+          <Header />
+        </div>
+      </header>
 
-      {/* Main Content */}
-      <main className="flex-grow flex items-center justify-center mt-20">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-white">
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -79,10 +82,11 @@ const ContactUs = () => {
             />
           </motion.div>
         </motion.div>
-      </main>
-
+      </div>
       {/* Footer */}
-      <Footer />
+      <div className="absolute bottom-0 left-0 w-full">
+        <Footer />
+      </div>
     </motion.div>
   );
 };
