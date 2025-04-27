@@ -123,7 +123,10 @@ function BloodDonationCentersContent() {
         </motion.div>
       )}
 
-      <HeroCarousel />
+      {/* Add margin-top to push HeroCarousel below the Header */}
+      <div className="mt-20"> {/* Adjust mt-20 (80px) based on Header height */}
+        <HeroCarousel />
+      </div>
 
       <div className="max-w-8xl mx-auto mt-6">
         <div className="flex justify-start space-x-4">
