@@ -21,7 +21,7 @@ const ContactUs = () => {
         transition={{ duration: 0.8, ease: "easeOut" }}
         className="flex-grow px-4 sm:px-6 md:px-10 py-6"
       >
-        <div className="flex flex-col items-center justify-center mt-10">
+        <div className="flex flex-col items-center justify-center mt-20">
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
