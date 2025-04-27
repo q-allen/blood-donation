@@ -596,7 +596,7 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
               type="submit"
               disabled={loading}
               className={`w-full py-3 rounded-lg transition duration-300 flex items-center justify-center ${
-                loading ? "bg-red-400 cursor-not-allowed" : "bg-red-500 hover:bg-red-600 text-white"
+                loading ? "bg-red-400 cursor-not-allowed" : "bg-gradient-to-r from-red-600 to-red-800 hover:bg-red-600 text-white"
               }`}
             >
               {loading && (
