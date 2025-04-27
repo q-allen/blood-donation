@@ -84,7 +84,7 @@ const ContactUs = () => {
         </motion.div>
       </div>
       {/* Footer */}
-      <div className="absolute bottom-0 left-0 w-full sticky">
+      <div className="sticky bottom-0 left-0 w-full">
         <Footer />
       </div>
     </motion.div>
