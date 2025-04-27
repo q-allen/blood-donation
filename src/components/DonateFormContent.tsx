@@ -50,7 +50,7 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
   const [fileName, setFileName] = useState<string | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
   const controls = useAnimation();
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, ""); // Remove trailing slash
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
 
   useEffect(() => {
     const handleScroll = () => {
@@ -69,7 +69,7 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
-    setErrors([]); // Clear errors on input change
+    setErrors([]);
   };
 
   const handleRadioChange = (index: number, value: string) => {
@@ -83,24 +83,30 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      console.log("File selected:", file.name, file.size, file.type);
+      // Validate file type and size (max 5MB)
+      const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+      if (!validTypes.includes(file.type)) {
+        setErrors(['Please upload a valid image file (JPEG, PNG, or GIF).']);
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setErrors(['Image file size must be less than 5MB.']);
+        return;
+      }
       setFileName(file.name);
-      setFormData((prev) => {
-        console.log("Updating formData with file:", file.name);
-        return { ...prev, IdCard: file };
-      });
+      setFormData((prev) => ({ ...prev, IdCard: file }));
+      setErrors([]);
     } else {
-      console.log("No file selected in handleImageUpload");
-      setErrors(["Please upload a valid identification card."]);
+      setErrors(['Please upload a valid identification card.']);
     }
   };
 
   const validateDate = (date: string): boolean => {
-    if (!date) return true; // Empty date is valid for optional fields
+    if (!date) return true;
     const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
     if (!dateRegex.test(date)) return false;
     const parsedDate = new Date(date);
-    return !isNaN(parsedDate.getTime()); // Ensure it's a valid date
+    return !isNaN(parsedDate.getTime());
   };
 
   const calculateAge = (dob: string): number => {
@@ -114,23 +120,52 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
     return age;
   };
 
+  const validatePhone = (phone: string): boolean => {
+    const phoneRegex = /^\+?[\d\s-]{10,}$/;
+    return phoneRegex.test(phone);
+  };
+
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validateLastDonationDate = (date: string, gender: string): boolean => {
+    if (!date) return true;
+    const lastDonation = new Date(date);
+    const today = new Date();
+    const daysSinceLastDonation = Math.floor(
+      (today.getTime() - lastDonation.getTime()) / (1000 * 60 * 60 * 24)
+    );
+    // Standard donation intervals: 56 days for men, 84 days for women
+    const minDays = gender === "Female" ? 84 : 56;
+    return daysSinceLastDonation >= minDays;
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrors([]);
     setLoading(true);
 
-    // Validate inputs
     const newErrors: string[] = [];
 
+    // Basic field validations
     if (!id || isNaN(parseInt(id))) {
       newErrors.push("Invalid hospital selection. Please select a hospital first.");
     }
 
-    const age = parseInt(formData.age, 10);
-    const weight = parseFloat(formData.weight);
-    const today = new Date().toISOString().split("T")[0];
+    if (!formData.firstName.trim()) {
+      newErrors.push("First name is required.");
+    }
+    if (!formData.lastName.trim()) {
+      newErrors.push("Last name is required.");
+    }
+    if (!formData.address.trim()) {
+      newErrors.push("Address is required.");
+    }
 
-    // Validate date_of_birth
+    // Date of birth validation
+    const today = new Date().toISOString().split("T")[0];
     if (!formData.dateOfBirth) {
       newErrors.push("Date of birth is required.");
     } else if (!validateDate(formData.dateOfBirth)) {
@@ -139,14 +174,15 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
       newErrors.push("Date of birth cannot be in the future.");
     }
 
-    // Validate age
+    // Age validation
+    const age = parseInt(formData.age, 10);
     if (!formData.age) {
       newErrors.push("Age is required.");
-    } else if (isNaN(age) || age < 16) {
-      newErrors.push("You must be at least 16 years old to donate blood.");
+    } else if (isNaN(age) || age < 16 || age > 120) {
+      newErrors.push("Age must be between 16 and 120 years.");
     }
 
-    // Validate age against date_of_birth
+    // Age and DOB consistency check
     if (formData.dateOfBirth && validateDate(formData.dateOfBirth)) {
       const calculatedAge = calculateAge(formData.dateOfBirth);
       if (!isNaN(age) && Math.abs(calculatedAge - age) > 1) {
@@ -154,23 +190,66 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
       }
     }
 
-    // Validate weight
-    if (isNaN(weight) || weight < 110) {
-      newErrors.push("You must weigh at least 110 lbs to donate blood.");
+    // Weight validation
+    const weight = parseFloat(formData.weight);
+    if (!formData.weight) {
+      newErrors.push("Weight is required.");
+    } else if (isNaN(weight) || weight < 110 || weight > 500) {
+      newErrors.push("Weight must be between 110 and 500 lbs.");
     }
 
-    // Validate last_donation_date
-    if (formData.lastDonationDate && !validateDate(formData.lastDonationDate)) {
-      newErrors.push("Last donation date must be in YYYY-MM-DD format (e.g., 2023-10-15).");
-    }
-    if (formData.lastDonationDate && formData.lastDonationDate > today) {
-      newErrors.push("Last donation date cannot be in the future.");
+    // Gender validation
+    if (!formData.gender) {
+      newErrors.push("Gender is required.");
     }
 
-    // Validate required fields
-    if (!formData.firstName || !formData.lastName || !formData.address) {
-      newErrors.push("Please fill in all required fields (First Name, Last Name, Address).");
+    // Blood type validation
+    if (!formData.bloodType) {
+      newErrors.push("Blood type is required.");
     }
+
+    // Phone validation
+    if (!formData.phone) {
+      newErrors.push("Phone number is required.");
+    } else if (!validatePhone(formData.phone)) {
+      newErrors.push("Please enter a valid phone number (minimum 10 digits).");
+    }
+
+    // Email validation
+    if (!formData.email) {
+      newErrors.push("Email is required.");
+    } else if (!validateEmail(formData.email)) {
+      newErrors.push("Please enter a valid email address.");
+    }
+
+    // Last donation date validation
+    if (formData.lastDonationDate) {
+      if (!validateDate(formData.lastDonationDate)) {
+        newErrors.push("Last donation date must be in YYYY-MM-DD format (e.g., 2023-10-15).");
+      } else if (formData.lastDonationDate > today) {
+        newErrors.push("Last donation date cannot be in the future.");
+      } else if (!validateLastDonationDate(formData.lastDonationDate, formData.gender)) {
+        const minDays = formData.gender === "Female" ? 84 : 56;
+        newErrors.push(
+          `You must wait at least ${minDays} days since your last donation before donating again.`
+        );
+      }
+    }
+
+    // Health questions validation
+    healthQuestions.forEach((question, index) => {
+      if (!formData.healthIssues[`healthIssues_${index}`]) {
+        newErrors.push(`Please answer health question: ${question}`);
+      }
+      // Flag potential ineligibility based on health questions
+      if (formData.healthIssues[`healthIssues_${index}`] === "yes") {
+        newErrors.push(
+          `Based on your response to "${question}", you may not be eligible to donate. Please consult with a healthcare professional.`
+        );
+      }
+    });
+
+    // Additional validations
     if (!formData.eligibilityConfirmed) {
       newErrors.push("You must confirm that you meet all donation requirements.");
     }
@@ -180,13 +259,6 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
     if (age < 18 && !formData.parentalConsent) {
       newErrors.push("Parental consent is required for donors under 18.");
     }
-
-    // Validate health questions
-    healthQuestions.forEach((_, index) => {
-      if (!formData.healthIssues[`healthIssues_${index}`]) {
-        newErrors.push(`Please answer health question: ${healthQuestions[index]}`);
-      }
-    });
 
     if (newErrors.length > 0) {
       setErrors(newErrors);
@@ -221,22 +293,18 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
 
     if (formData.IdCard) {
       formDataToSubmit.append("id_card", formData.IdCard);
-      console.log("File attached to FormData:", formData.IdCard.name, formData.IdCard.size);
     }
 
     try {
-      console.log("Submitting to:", `${apiUrl}/api/blood_donation/`);
-      console.log("FormData entries:", Object.fromEntries(formDataToSubmit));
-
       const response = await axios.post(`${apiUrl}/api/blood_donation/`, formDataToSubmit, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
+        timeout: 10000, // Add timeout to prevent hanging
       });
 
       if (response.status === 201) {
         alert("Thank you for your willingness to donate blood!");
-        // Reset form
         setFormData({
           firstName: "",
           middleName: "",
@@ -259,21 +327,25 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
       }
     } catch (error) {
       let errorMessages: string[] = [];
-      if (axios.isAxiosError(error) && error.response?.data) {
-        console.error("Backend error response:", error.response.data);
-        if (typeof error.response.data === "object") {
-          errorMessages = Object.entries(error.response.data).map(([field, messages]) => {
-            const fieldName = field
-              .replace(/_/g, " ")
-              .replace(/\b\w/g, (char) => char.toUpperCase());
-            return `${fieldName}: ${Array.isArray(messages) ? messages.join(", ") : messages}`;
-          });
+      if (axios.isAxiosError(error)) {
+        if (error.code === 'ECONNABORTED') {
+          errorMessages = ['Request timed out. Please check your internet connection and try again.'];
+        } else if (error.response?.data) {
+          if (typeof error.response.data === "object") {
+            errorMessages = Object.entries(error.response.data).map(([field, messages]) => {
+              const fieldName = field
+                .replace(/_/g, " ")
+                .replace(/\b\w/g, (char) => char.toUpperCase());
+              return `${fieldName}: ${Array.isArray(messages) ? messages.join(", ") : messages}`;
+            });
+          } else {
+            errorMessages = [error.response.data.error || "Unknown server error"];
+          }
         } else {
-          errorMessages = [error.response.data.error || "Unknown server error"];
+          errorMessages = ["Network error. Please check your connection and try again."];
         }
       } else {
-        console.error("Error submitting form:", error);
-        errorMessages = ["Network error. Please check your connection and try again."];
+        errorMessages = ["An unexpected error occurred. Please try again later."];
       }
       setErrors(errorMessages);
     } finally {
@@ -402,7 +474,7 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
                 onChange={handleChange}
                 className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 transition"
                 required
-                max={new Date().toISOString().split("T")[0]} // Prevent future dates
+                max={new Date().toISOString().split("T")[0]}
               />
             </motion.div>
             <motion.div className="grid grid-cols-2 gap-4">
@@ -443,6 +515,7 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
                   required
                   placeholder="Enter your age"
                   min="16"
+                  max="120"
                 />
               </div>
               <div>
@@ -456,6 +529,7 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
                   required
                   placeholder="Enter your weight in lbs"
                   min="110"
+                  max="500"
                 />
               </div>
               <div>
@@ -502,7 +576,7 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
                 value={formData.lastDonationDate}
                 onChange={handleChange}
                 className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 transition"
-                max={new Date().toISOString().split("T")[0]} // Prevent future dates
+                max={new Date().toISOString().split("T")[0]}
               />
             </motion.div>
             <motion.div>
@@ -595,7 +669,7 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
               whileTap={{ scale: 0.95 }}
               type="submit"
               disabled={loading}
-              className={`w-full py-3 rounded-lg transition duration-300 flex items-center justify-center ${
+              className={`w'urgence w-full py-3 rounded-lg transition duration-300 flex items-center justify-center ${
                 loading ? "bg-red-400 cursor-not-allowed" : "bg-gradient-to-r from-red-600 to-red-800 hover:bg-red-600 text-white"
               }`}
             >
