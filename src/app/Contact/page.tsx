@@ -26,7 +26,7 @@ const ContactUs = () => {
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="bg-white p-4 sm:p-6 mb-20 md:p-8 rounded-2xl shadow-lg w-full max-w-4xl flex flex-col md:flex-row"
+            className="bg-white p-4 sm:p-6 mt-20 mb-20 md:p-8 rounded-2xl shadow-lg w-full max-w-4xl flex flex-col md:flex-row"
           >
             <motion.div
               initial={{ x: -50, opacity: 0 }}
