@@ -4,6 +4,7 @@ import { FaUser, FaLock } from "react-icons/fa";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import Header from "../../components/Header";
+import Footer from "@/components/footer";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
@@ -175,6 +176,7 @@ export default function LoginPage() {
           </motion.div>
         </motion.div>
       </div>
+      <Footer />
     </motion.div>
   );
 }
