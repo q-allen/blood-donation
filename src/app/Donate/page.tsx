@@ -107,7 +107,7 @@ function BloodDonationCentersContent() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
-          className="max-w-4xl mx-auto p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-lg shadow-md mb-6 flex items-center justify-between"
+          className="max-w-4xl mx-auto p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-lg shadow-md mb-6 flex items-center justify-between z-50"
         >
           <div className="flex items-center">
             <FaExclamationCircle className="text-red-500 mr-3 text-lg" />
