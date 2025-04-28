@@ -95,9 +95,11 @@ function BloodDonationCentersContent() {
       className="bg-white text-gray-900 min-h-screen py-6 relative"
     >
       {/* Header */}
-      <div className="relative z-10">
-        <Header />
-      </div>
+      <header className="fixed top-0 left-0 w-full z-50 bg-white">
+        <div className="relative z-10"> {/* Header on top with higher z-index */}
+          <Header />
+        </div>
+      </header>
 
       {error && (
         <motion.div
@@ -122,11 +124,9 @@ function BloodDonationCentersContent() {
       )}
 
       {/* Add margin-top to push HeroCarousel below the Header */}
-      {/* <div className="mt-10">
+      <div className="mt-10"> {/* Adjust mt-20 (80px) based on Header height */}
         <HeroCarousel />
-      </div> */}
-
-      <HeroCarousel />
+      </div>
 
       <div className="max-w-8xl mx-auto mt-6">
         <div className="flex justify-start space-x-4">
