@@ -95,11 +95,9 @@ function BloodDonationCentersContent() {
       className="bg-white text-gray-900 min-h-screen py-6 relative"
     >
       {/* Header */}
-      <header className="fixed top-0 left-0 w-full z-50 bg-white">
-        <div className="relative z-10"> {/* Header on top with higher z-index */}
-          <Header />
-        </div>
-      </header>
+      <div className="relative z-10">
+        <Header />
+      </div>
 
       {error && (
         <motion.div
