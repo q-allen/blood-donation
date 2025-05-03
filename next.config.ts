@@ -6,18 +6,23 @@ const nextConfig = {
         protocol: 'http',
         hostname: '127.0.0.1',
         port: '8000',
-        pathname: '/media/**', // Updated to match /media/hospital_images/
+        pathname: '/media/**', // Updated for local dev
       },
       {
         protocol: 'http',
         hostname: '192.168.254.152',
         port: '8000',
-        pathname: '/media/**', // Add for network IP
+        pathname: '/media/**', // For local network dev
+      },
+      {
+        protocol: 'https',
+        hostname: 'backend-bwoh.onrender.com',
+        pathname: '/media/**', // For production backend
       },
     ],
   },
   experimental: {
-    allowedDevOrigins: ['http://192.168.254.152'], // Already correct
+    allowedDevOrigins: ['http://192.168.254.152'], // Keep for dev
   },
 };
 
