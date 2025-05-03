@@ -27,13 +27,13 @@ export default function Page() {
       </header>
 
       {/* Main Content */}
-      <div className="flex flex-col lg:flex-row items-center px-4 sm:px-6 lg:px-10 mt-20 sm:mt-24 lg:mt-28 relative z-0">
+      <div className="flex flex-col md:flex-row items-center px-4 sm:px-6 lg:px-10 mt-16 sm:mt-20 lg:mt-24 relative z-0 pt-16 sm:pt-20 lg:pt-24">
         {/* Left Section */}
         <motion.div
           initial={{ x: -50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ duration: 1 }}
-          className="w-full lg:w-1/2 text-center lg:text-left relative mb-8 lg:mb-0"
+          className="md:w-1/2 text-center md:text-left relative mb-8 lg:mb-0"
         >
           <h2 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-red-600">
             Donate Blood, <span className="text-yellow-500">Save Lives</span>
@@ -47,10 +47,7 @@ export default function Page() {
             whileTap={{ scale: 0.95 }}
             transition={{ duration: 0.3 }}
             type="button"
-            onClick={() => {
-              router.push("/Donate");
-              alert("Redirecting to Donation Page");
-            }}
+            onClick={() => { router.push("/Donate"); alert("Redirecting to Donation Page"); }}
             className="bg-gradient-to-r from-red-600 to-red-800 text-white font-bold px-4 py-2 sm:px-6 sm:py-3 rounded-full mt-6 hover:bg-red-700 transition"
           >
             DONATE NOW
@@ -62,15 +59,15 @@ export default function Page() {
           initial={{ x: 50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ duration: 1 }}
-          className="w-full lg:w-1/2 flex justify-center lg:justify-end mt-8 lg:mt-0 relative"
+          className="md:w-1/2 flex flex-col items-center mt-8 md:mt-0 relative"
         >
-          {/* Blood Donation Image */}
+          {/* Blood Donation Image (Fade-in with Slight Rotation) */}
           <motion.div
             initial={{ opacity: 0, rotate: -5, scale: 0.9 }}
             animate={{ opacity: 1, rotate: 0, scale: 1 }}
             transition={{ duration: 1 }}
             whileHover={{ scale: 1.05, rotate: 3 }}
-            className="rounded-2xl w-full max-w-sm sm:max-w-md lg:max-w-lg"
+            className="rounded-2xl mt-5 w-full max-w-sm sm:max-w-md lg:max-w-lg"
           >
             <Image
               src="/images/home.png"
@@ -84,13 +81,10 @@ export default function Page() {
           </motion.div>
         </motion.div>
       </div>
-
-      {/* Other Components */}
       <div className="px-4 sm:px-6 lg:px-10">
         <HeroCarousel />
         <About />
       </div>
-
       {/* Footer */}
       <Footer />
     </motion.div>
