@@ -76,7 +76,7 @@ export default function Header() {
   };
 
   return (
-    <header className="flex flex-col sm:flex-row justify-between items-center bg-white text-red-600 px-4 sm:px-10 py-4 sm:py-6">
+    <header className="flex flex-col sm:flex-row justify-between items-center bg-white text-red-600 px-4 sm:px-10 py-2 sm:py-3 h-16 sm:h-20">
       {/* Logo and Hamburger Menu */}
       <div className="flex justify-between items-center w-full sm:w-auto">
         <Image

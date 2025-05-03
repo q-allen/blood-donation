@@ -27,7 +27,7 @@ import { useRouter } from "next/navigation";
     </header>
 
     {/* Main Content */}
-    <div className="flex flex-col md:flex-row items-center px-10 relative z-0"> {/* Content stays behind */}
+    <div className="flex flex-col md:flex-row items-center px-4 sm:px-6 lg:px-10 mt-16 sm:mt-20 lg:mt-24 relative z-0 pt-16 sm:pt-20 lg:pt-24"> {/* Content stays behind */}
       {/* Left Section */}
       <motion.div
         initial={{ x: -50, opacity: 0 }}
@@ -67,7 +67,7 @@ import { useRouter } from "next/navigation";
           animate={{ opacity: 1, rotate: 0, scale: 1 }}
           transition={{ duration: 1 }}
           whileHover={{ scale: 1.05, rotate: 3 }}
-          className="rounded-2xl mt-5"
+          className="rounded-2xl mt-5 w-full max-w-sm sm:max-w-md lg:max-w-lg"
         >
           <Image
             src="/images/home.png"  // Replace with actual blood donation image
@@ -75,7 +75,8 @@ import { useRouter } from "next/navigation";
             quality={100}
             width={500}
             height={600}
-            className="rounded-2xl object-cover z-10"
+            className="rounded-2xl object-cover w-full h-auto z-10"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 500px"
           />
         </motion.div>
       </motion.div>
