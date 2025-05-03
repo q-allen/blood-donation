@@ -27,7 +27,7 @@ import { useRouter } from "next/navigation";
     </header>
 
     {/* Main Content */}
-    <div className="flex flex-col md:flex-row items-center px-10 relative z-0"> {/* Content stays behind */}
+    <div className="flex flex-col md:flex-row items-center px-10 relative z-0 mt-10"> {/* Content stays behind */}
       {/* Left Section */}
       <motion.div
         initial={{ x: -50, opacity: 0 }}
