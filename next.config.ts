@@ -6,12 +6,18 @@ const nextConfig = {
         protocol: 'http',
         hostname: '127.0.0.1',
         port: '8000',
-        pathname: '/hospital_images/**',
+        pathname: '/media/**', // Updated to match /media/hospital_images/
+      },
+      {
+        protocol: 'http',
+        hostname: '192.168.254.152',
+        port: '8000',
+        pathname: '/media/**', // Add for network IP
       },
     ],
   },
   experimental: {
-    allowedDevOrigins: ['http://192.168.254.152'], // Add this to suppress the dev warning
+    allowedDevOrigins: ['http://192.168.254.152'], // Already correct
   },
 };
 

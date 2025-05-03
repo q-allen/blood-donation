@@ -29,6 +29,7 @@ function BloodDonationCentersContent() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  // const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/"; // Fallback to localhost if not set
 
   // Check if user is authenticated
   const isAuthenticated = () => {
