@@ -88,13 +88,24 @@ export default function Header() {
           className="cursor-pointer"
           onClick={() => router.push("/")}
         />
-        <button
-          className="sm:hidden p-1"
-          onClick={toggleMobileMenu}
-          aria-label="Toggle mobile menu"
-        >
-          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
+        <div className="flex items-center space-x-2">
+          <button
+            className="sm:hidden p-1"
+            onClick={toggleMobileMenu}
+            aria-label="Toggle mobile menu"
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+          <motion.button
+            type="button"
+            className="p-1 sm:hidden hover:text-gray-400 flex items-center"
+            whileHover={{ scale: 1.2 }}
+            onClick={handleProfileClick}
+          >
+            <User className="w-6 h-6" />
+            {users && <span className="text-xs font-medium ml-1">{users.username}</span>}
+          </motion.button>
+        </div>
       </div>
 
       {/* Navigation Links */}
