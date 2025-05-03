@@ -27,7 +27,7 @@ export default function Page() {
       </header>
 
       {/* Main Content */}
-      <div className="flex flex-col lg:flex-row items-center px-4 sm:px-6 lg:px-10 mt-16 lg:mt-20 relative z-0">
+      <div className="flex flex-col lg:flex-row items-center px-4 sm:px-6 lg:px-10 mt-16 lg:mt-40 relative z-0">
         {/* Left Section */}
         <motion.div
           initial={{ x: -50, opacity: 0 }}
