@@ -76,7 +76,7 @@ export default function Header() {
   };
 
   return (
-    <header className="flex flex-col sm:flex-row justify-between items-center bg-white text-red-600 px-4 sm:px-10 py-2 sm:py-3 h-16 sm:h-20">
+    <header className="flex flex-col sm:flex-row justify-between items-center bg-white text-red-600 px-4 sm:px-10 py-4 sm:py-6">
       {/* Logo and Hamburger Menu */}
       <div className="flex justify-between items-center w-full sm:w-auto">
         <Image
@@ -98,11 +98,11 @@ export default function Header() {
       </div>
 
       {/* Navigation Links */}
-      <div className={`flex flex-col sm:flex-row gap-2 sm:gap-4 mt-2 sm:mt-0 w-full sm:w-auto ${mobileMenuOpen ? "flex" : "hidden sm:flex"}`}>
+      <div className={`flex flex-col sm:flex-row gap-4 sm:gap-6 mt-4 sm:mt-0 w-full sm:w-auto ${mobileMenuOpen ? "flex" : "hidden sm:flex"}`}>
         <motion.button
           whileHover={{ scale: 1.1 }}
           onClick={() => router.push("/")}
-          className="hover:underline text-sm sm:text-base"
+          className="hover:underline text-lg sm:text-base"
         >
           Home
         </motion.button>
@@ -110,7 +110,7 @@ export default function Header() {
         <motion.button
           whileHover={{ scale: 1.1 }}
           onClick={() => router.push("/Donate")}
-          className="hover:underline text-sm sm:text-base"
+          className="hover:underline text-lg sm:text-base"
         >
           Donate
         </motion.button>
@@ -118,7 +118,7 @@ export default function Header() {
         <motion.button
           whileHover={{ scale: 1.1 }}
           onClick={() => router.push("/About")}
-          className="hover:underline text-sm sm:text-base"
+          className="hover:underline text-lg sm:text-base"
         >
           About
         </motion.button>
@@ -126,22 +126,22 @@ export default function Header() {
         <motion.button
           whileHover={{ scale: 1.1 }}
           onClick={() => router.push("/Contact")}
-          className="hover:underline text-sm sm:text-base"
+          className="hover:underline text-lg sm:text-base"
         >
           Contact Us
         </motion.button>
       </div>
 
       {/* Profile Dropdown */}
-      <div className="relative mt-2 sm:mt-0">
+      <div className="relative mt-4 sm:mt-0">
         <motion.button
           type="button"
-          className="p-1 hover:text-gray-400 flex items-center"
+          className="p-2 hover:text-gray-400 flex items-center"
           whileHover={{ scale: 1.2 }}
           onClick={handleProfileClick}
         >
           <User className="w-6 h-6" />
-          {users && <span className="text-xs sm:text-sm font-medium ml-1">{users.username}</span>}
+          {users && <span className="text-sm font-medium ml-2">{users.username}</span>}
         </motion.button>
 
         <AnimatePresence>
