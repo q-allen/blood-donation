@@ -43,6 +43,7 @@ function BloodDonationCentersContent() {
         setIsLoading(true);
         const response = await axios.get(`${apiUrl}api/hospitals/`);
         setCenters(response.data);
+        console.log(response.data)
       } catch (error) {
         console.error("Error fetching hospitals:", error);
         setError("Failed to load donation centers. Please try again later.");
