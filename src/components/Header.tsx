@@ -77,7 +77,7 @@ export default function Header() {
 
   return (
     <header className="flex flex-col sm:flex-row justify-between items-center bg-white text-red-600 px-4 sm:px-10 py-2 sm:py-3 h-16 sm:h-20">
-      {/* Logo and Hamburger Menu */}
+      {/* Logo and Navigation Controls */}
       <div className="flex justify-between items-center w-full sm:w-auto">
         <Image
           src="/images/logo.png"
@@ -109,11 +109,11 @@ export default function Header() {
       </div>
 
       {/* Navigation Links */}
-      <div className={`flex flex-col sm:flex-row gap-4 sm:gap-6 mt-4 sm:mt-0 w-full sm:w-auto ${mobileMenuOpen ? "flex" : "hidden sm:flex"}`}>
+      <div className={`flex flex-col sm:flex-row gap-2 sm:gap-4 mt-2 sm:mt-0 w-full sm:w-auto ${mobileMenuOpen ? "flex" : "hidden sm:flex"}`}>
         <motion.button
           whileHover={{ scale: 1.1 }}
           onClick={() => router.push("/")}
-          className="hover:underline text-lg sm:text-base"
+          className="hover:underline text-sm sm:text-base"
         >
           Home
         </motion.button>
@@ -121,7 +121,7 @@ export default function Header() {
         <motion.button
           whileHover={{ scale: 1.1 }}
           onClick={() => router.push("/Donate")}
-          className="hover:underline text-lg sm:text-base"
+          className="hover:underline text-sm sm:text-base"
         >
           Donate
         </motion.button>
@@ -129,7 +129,7 @@ export default function Header() {
         <motion.button
           whileHover={{ scale: 1.1 }}
           onClick={() => router.push("/About")}
-          className="hover:underline text-lg sm:text-base"
+          className="hover:underline text-sm sm:text-base"
         >
           About
         </motion.button>
@@ -137,14 +137,14 @@ export default function Header() {
         <motion.button
           whileHover={{ scale: 1.1 }}
           onClick={() => router.push("/Contact")}
-          className="hover:underline text-lg sm:text-base"
+          className="hover:underline text-sm sm:text-base"
         >
           Contact Us
         </motion.button>
       </div>
 
-      {/* Profile Dropdown */}
-      <div className="relative mt-4 sm:mt-0">
+      {/* Profile Dropdown (Desktop) */}
+      <div className="hidden sm:block relative">
         <motion.button
           type="button"
           className="p-2 hover:text-gray-400 flex items-center"
