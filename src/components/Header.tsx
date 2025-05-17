@@ -141,6 +141,14 @@ export default function Header() {
         >
           Contact Us
         </motion.button>
+
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          onClick={() => router.push("/Contact")}
+          className="hover:underline text-sm sm:text-base"
+        >
+          Transactions
+        </motion.button>
       </div>
 
       {/* Profile Dropdown (Desktop) */}
