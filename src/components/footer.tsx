@@ -52,7 +52,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="mt-8 pt-8 border-t border-red-500 text-center">
           <p className="text-sm">
-            © {new Date().getFullYear()} Blood Donation System. All rights reserved.
+            © {new Date().getFullYear()} Developed by: Mary Rose Allen Y. Quijano
           </p>
         </div>
       </div>
