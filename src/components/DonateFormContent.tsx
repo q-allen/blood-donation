@@ -370,7 +370,7 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
               <span>{location || "Unknown Location"}</span>
             </p>
           </div>
-          {/* Advertisement Section */}
+          {/* First Advertisement Section */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -379,8 +379,8 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
           >
             <a href="https://www.postermywall.com/index.php/art/template/a701f497da738ff788a6e0abd5aa7565/blood-donation-flyer-design-template" target="_blank" rel="noopener noreferrer">
               <Image
-                src="/images/ad.jpg" // Replace with actual ad image URL
-                alt="Advertisement"
+                src="/images/ad.jpg"
+                alt="Blood Donation Campaign"
                 width={300}
                 height={100}
                 className="w-full h-auto rounded-lg object-cover"
@@ -699,6 +699,25 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
               {loading ? "Submitting..." : "Submit"}
             </motion.button>
           </form>
+        </motion.div>
+        {/* Second Advertisement Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.4, type: "spring", stiffness: 100 }}
+          className="w-full bg-gradient-to-r from-red-500 to-red-700 rounded-lg shadow-xl p-4 sm:p-6 mt-6"
+        >
+          <a href="https://www.redcross.org/donate-blood.html" target="_blank" rel="noopener noreferrer">
+            <Image
+              src="/ad-lifesavers.jpg"
+              alt="Join the Lifesavers Campaign"
+              width={600}
+              height={150}
+              className="w-full h-auto rounded-lg object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+            <p className="text-center text-white text-lg font-bold mt-3">Join the Lifesavers: Donate Blood Today!</p>
+            <p className="text-center text-sm text-white mt-1">Your donation can save up to 3 lives. Be a hero!</p>
+          </a>
         </motion.div>
       </main>
     </motion.div>
