@@ -395,9 +395,9 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
             transition={{ duration: 0.4, delay: 0.4, type: "spring", stiffness: 100 }}
             className="w-full bg-gradient-to-r from-red-500 to-red-700 rounded-lg shadow-xl p-4"
           >
-            <a href="https://www.redcross.org/donate-blood.html" target="_blank" rel="noopener noreferrer" aria-label="Join the Lifesavers blood donation campaign">
+            <a href="https://www.adsoftheworld.com/campaigns/lifesavers" target="_blank" rel="noopener noreferrer" aria-label="Join the Lifesavers blood donation campaign">
               <Image
-                src="/ad-lifesavers.jpg"
+                src="/images/ad2.jpg"
                 alt="Join the Lifesavers Campaign"
                 width={300}
                 height={100}
