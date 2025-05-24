@@ -83,7 +83,6 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // Validate file type and size (max 5MB)
       const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
       if (!validTypes.includes(file.type)) {
         setErrors(['Please upload a valid image file (JPEG, PNG, or GIF).']);
@@ -137,7 +136,6 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
     const daysSinceLastDonation = Math.floor(
       (today.getTime() - lastDonation.getTime()) / (1000 * 60 * 60 * 24)
     );
-    // Standard donation intervals: 56 days for men, 84 days for women
     const minDays = gender === "Female" ? 84 : 56;
     return daysSinceLastDonation >= minDays;
   };
@@ -149,7 +147,6 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
 
     const newErrors: string[] = [];
 
-    // Basic field validations
     if (!id || isNaN(parseInt(id))) {
       newErrors.push("Invalid hospital selection. Please select a hospital first.");
     }
@@ -164,17 +161,14 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
       newErrors.push("Address is required.");
     }
 
-    // Date of birth validation
-    const today = new Date().toISOString().split("T")[0];
     if (!formData.dateOfBirth) {
       newErrors.push("Date of birth is required.");
     } else if (!validateDate(formData.dateOfBirth)) {
       newErrors.push("Date of birth must be in YYYY-MM-DD format (e.g., 1990-01-01).");
-    } else if (formData.dateOfBirth > today) {
+    } else if (formData.dateOfBirth > new Date().toISOString().split("T")[0]) {
       newErrors.push("Date of birth cannot be in the future.");
     }
 
-    // Age validation
     const age = parseInt(formData.age, 10);
     if (!formData.age) {
       newErrors.push("Age is required.");
@@ -182,7 +176,6 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
       newErrors.push("Age must be between 16 and 120 years.");
     }
 
-    // Age and DOB consistency check
     if (formData.dateOfBirth && validateDate(formData.dateOfBirth)) {
       const calculatedAge = calculateAge(formData.dateOfBirth);
       if (!isNaN(age) && Math.abs(calculatedAge - age) > 1) {
@@ -190,7 +183,6 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
       }
     }
 
-    // Weight validation
     const weight = parseFloat(formData.weight);
     if (!formData.weight) {
       newErrors.push("Weight is required.");
@@ -198,35 +190,30 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
       newErrors.push("Weight must be between 110 and 500 lbs.");
     }
 
-    // Gender validation
     if (!formData.gender) {
       newErrors.push("Gender is required.");
     }
 
-    // Blood type validation
     if (!formData.bloodType) {
       newErrors.push("Blood type is required.");
     }
 
-    // Phone validation
     if (!formData.phone) {
       newErrors.push("Phone number is required.");
     } else if (!validatePhone(formData.phone)) {
       newErrors.push("Please enter a valid phone number (minimum 10 digits).");
     }
 
-    // Email validation
     if (!formData.email) {
       newErrors.push("Email is required.");
     } else if (!validateEmail(formData.email)) {
       newErrors.push("Please enter a valid email address.");
     }
 
-    // Last donation date validation
     if (formData.lastDonationDate) {
       if (!validateDate(formData.lastDonationDate)) {
         newErrors.push("Last donation date must be in YYYY-MM-DD format (e.g., 2023-10-15).");
-      } else if (formData.lastDonationDate > today) {
+      } else if (formData.lastDonationDate > new Date().toISOString().split("T")[0]) {
         newErrors.push("Last donation date cannot be in the future.");
       } else if (!validateLastDonationDate(formData.lastDonationDate, formData.gender)) {
         const minDays = formData.gender === "Female" ? 84 : 56;
@@ -236,12 +223,10 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
       }
     }
 
-    // Health questions validation
     healthQuestions.forEach((question, index) => {
       if (!formData.healthIssues[`healthIssues_${index}`]) {
         newErrors.push(`Please answer health question: ${question}`);
       }
-      // Flag potential ineligibility based on health questions
       if (formData.healthIssues[`healthIssues_${index}`] === "yes") {
         newErrors.push(
           `Based on your response to "${question}", you may not be eligible to donate. Please consult with a healthcare professional.`
@@ -249,7 +234,6 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
       }
     });
 
-    // Additional validations
     if (!formData.eligibilityConfirmed) {
       newErrors.push("You must confirm that you meet all donation requirements.");
     }
@@ -266,7 +250,6 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
       return;
     }
 
-    // Prepare FormData
     const formDataToSubmit = new FormData();
     formDataToSubmit.append("hospital", id.toString());
     formDataToSubmit.append("first_name", formData.firstName);
@@ -300,7 +283,7 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
         headers: {
           "Content-Type": "multipart/form-data",
         },
-        timeout: 10000, // Add timeout to prevent hanging
+        timeout: 10000,
       });
 
       if (response.status === 201) {
@@ -359,15 +342,15 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
-      className="bg-white text-gray-900 min-h-screen px-10 py-6 relative"
+      className="bg-white text-gray-900 min-h-screen px-4 sm:px-6 lg:px-8 py-6 relative"
     >
       <Header />
-      <main className="flex p-8 space-x-8">
+      <main className="flex flex-col md:flex-row p-4 sm:p-6 lg:p-8 space-y-6 md:space-y-0 md:space-x-6 max-w-full mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="flex flex-col space-y-6 p-6 w-1/3 items-center"
+          className="flex flex-col space-y-4 p-4 sm:p-6 w-full md:w-1/3 items-center"
         >
           <div className="relative">
             <Image
@@ -375,30 +358,48 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
               alt={name || "Hospital"}
               width={200}
               height={200}
-              className="w-48 h-48 md:w-56 md:h-56 object-cover rounded-full shadow-xl border-4 border-white bg-gray-100"
+              className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 object-cover rounded-full shadow-xl border-4 border-white bg-gray-100"
             />
             <div className="absolute inset-0 rounded-full ring-2 ring-gray-200 opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
           </div>
           <div className="bg-white shadow-lg rounded-lg p-4 w-full">
-            <p className="text-black text-center text-2xl font-semibold p-4">{name || "Hospital Name"}</p>
+            <p className="text-black text-center text-xl sm:text-2xl font-semibold p-4">{name || "Hospital Name"}</p>
             <p className="text-black text-sm py-2 pl-2">{description || "No description available"}</p>
             <p className="text-black text-sm flex items-center justify-center text-sm italic gap-2">
               <MapPin className="w-4 h-4 text-red-500" />
               <span>{location || "Unknown Location"}</span>
             </p>
           </div>
+          {/* Advertisement Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            className="w-full bg-gray-100 rounded-lg shadow-md p-4"
+          >
+            <a href="https://www.postermywall.com/index.php/art/template/a701f497da738ff788a6e0abd5aa7565/blood-donation-flyer-design-template" target="_blank" rel="noopener noreferrer">
+              <Image
+                src="/images/ad.jpg" // Replace with actual ad image URL
+                alt="Advertisement"
+                width={300}
+                height={100}
+                className="w-full h-auto rounded-lg object-cover"
+              />
+              <p className="text-center text-sm text-gray-600 mt-2">Support Our Cause - Learn More!</p>
+            </a>
+          </motion.div>
         </motion.div>
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="w-2/3 bg-white shadow-lg p-8 rounded"
+          className="w-full md:w-2/3 bg-white shadow-lg p-6 sm:p-8 rounded"
         >
           <motion.h2
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.4, delay: 0.2 }}
-            className="text-3xl font-bold mb-6 text-red-600"
+            className="text-2xl sm:text-3xl font-bold mb-6 text-red-600"
           >
             BLOOD DONATION FORM
           </motion.h2>
@@ -416,7 +417,7 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
               </ul>
             </motion.div>
           )}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <motion.div>
               <label className="block font-medium">First Name</label>
               <input
@@ -477,7 +478,7 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
                 max={new Date().toISOString().split("T")[0]}
               />
             </motion.div>
-            <motion.div className="grid grid-cols-2 gap-4">
+            <motion.div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block font-medium">Phone Number</label>
                 <input
@@ -503,7 +504,7 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
                 />
               </div>
             </motion.div>
-            <motion.div className="grid grid-cols-4 gap-4">
+            <motion.div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div>
                 <label className="block font-medium">Age</label>
                 <input
@@ -669,7 +670,7 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
               whileTap={{ scale: 0.95 }}
               type="submit"
               disabled={loading}
-              className={`w'urgence w-full py-3 rounded-lg transition duration-300 flex items-center justify-center ${
+              className={`w-full py-3 rounded-lg transition duration-300 flex items-center justify-center ${
                 loading ? "bg-red-400 cursor-not-allowed" : "bg-gradient-to-r from-red-600 to-red-800 hover:bg-red-600 text-white"
               }`}
             >
