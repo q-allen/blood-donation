@@ -144,7 +144,7 @@ export default function Header() {
 
         <motion.button
           whileHover={{ scale: 1.1 }}
-          onClick={() => router.push("/Contact")}
+          onClick={() => router.push("/Transactions")}
           className="hover:underline text-sm sm:text-base"
         >
           Transactions
