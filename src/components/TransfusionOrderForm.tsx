@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { setServers } from "dns";
 
 interface TransfusionOrderFormProps {
   setError: (error: string | null) => void;
@@ -10,30 +11,32 @@ interface TransfusionOrderFormProps {
 
 export default function TransfusionOrderForm({ setError }: TransfusionOrderFormProps) {
   const router = useRouter();
+
   const [formData, setFormData] = useState({
-    patientName: "",
-    bloodProduct: "",
+    patient_name: "",
+    blood_product: "",
     amount: "",
-    transfusionRate: "",
+    transfusion_rate: "",
     reason: "",
+    blood_type: "unknown",
+    status: "Pending" // Added bloodType
   });
 
-  // Check if user is authenticated
-  const isAuthenticated = () => {
-    const token = localStorage.getItem("access");
-    console.log("Checking access token:", token);
-    return !!token;
-  };
+  // Success message state
+  const [success, setSuccess] = useState<string | null>(null);
 
-  // Handle form input changes
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const isAuthenticated = () => !!localStorage.getItem("access");
+
+  const handleFormChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle form submission
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!isAuthenticated()) {
       setError("Please sign in to request blood.");
       setTimeout(() => {
@@ -42,122 +45,133 @@ export default function TransfusionOrderForm({ setError }: TransfusionOrderFormP
       return;
     }
 
-    // Add logic to submit the form data to your backend
-    console.log("Form submitted:", formData);
-    setError("Blood request submitted successfully!");
-    setFormData({
-      patientName: "",
-      bloodProduct: "",
-      amount: "",
-      transfusionRate: "",
-      reason: "",
-    });
+    const token = localStorage.getItem("access");
+
+    try {
+      const res = await fetch("http://localhost:8000/api/request-blood/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (res.ok) {
+        setSuccess("✅ Blood request submitted successfully!");
+        setFormData({
+          patient_name: "",
+          blood_product: "",
+          amount: "",
+          transfusion_rate: "",
+          reason: "",
+          blood_type: "unknown",
+          status: "Pending",
+        });
+      } else {
+        const data = await res.json();
+       
+        setError(`❌ Error: ${data.detail || "Failed to submit request"}`);
+      }
+    } catch (error) {
+      setError("❌ An error occurred while submitting the request.");
+    }
   };
 
   return (
     <motion.div
-      className="max-w-4xl mx-auto p-10"
+      className="max-w-3xl mx-auto mt-10 p-6 bg-white rounded-lg shadow"
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
+      transition={{ duration: 0.5 }}
     >
-      <h2 className="text-2xl font-semibold mb-6">Transfusion Order Form</h2>
-      <form onSubmit={handleFormSubmit} className="bg-white p-6 rounded-lg shadow-md">
-        <div className="mb-4">
-          <label htmlFor="patientName" className="block text-gray-700 mb-2">
-            Patient Name
-          </label>
-          <input
-            type="text"
-            id="patientName"
-            name="patientName"
-            value={formData.patientName}
-            onChange={handleFormChange}
-            placeholder="Enter patient's full name"
-            className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-            required
-          />
+      <h2 className="text-2xl font-bold mb-6">Transfusion Order Form</h2>
+      {success && (
+        <div className="mb-4 text-green-700 bg-green-100 px-4 py-2 rounded">
+          {success}
         </div>
+      )}
+      <form onSubmit={handleFormSubmit} className="space-y-4">
 
-        <div className="mb-4">
-          <label htmlFor="bloodProduct" className="block text-gray-700 mb-2">
-            Blood Product
-          </label>
-          <select
-            id="bloodProduct"
-            name="bloodProduct"
-            value={formData.bloodProduct}
-            onChange={handleFormChange}
-            className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-            required
-          >
-            <option value="">Select blood type</option>
-            <option value="A+">A+</option>
-            <option value="A-">A-</option>
-            <option value="B+">B+</option>
-            <option value="B-">B-</option>
-            <option value="AB+">AB+</option>
-            <option value="AB-">AB-</option>
-            <option value="O+">O+</option>
-            <option value="O-">O-</option>
-          </select>
-        </div>
+        <input
+          type="text"
+          name="patient_name"
+          placeholder="Patient Name"
+          value={formData.patient_name}
+          onChange={handleFormChange}
+          required
+          className="w-full px-4 py-2 border rounded"
+        />
 
-        <div className="mb-4">
-          <label htmlFor="amount" className="block text-gray-700 mb-2">
-            Amount (in units or mL)
-          </label>
-          <input
-            type="text"
-            id="amount"
-            name="amount"
-            value={formData.amount}
-            onChange={handleFormChange}
-            placeholder="e.g., 2 units or 500 mL"
-            className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-            required
-          />
-        </div>
+        <input
+          type="text"
+          name="blood_product"
+          placeholder="Blood Product (e.g. Whole Blood)"
+          value={formData.blood_product}
+          onChange={handleFormChange}
+          required
+          className="w-full px-4 py-2 border rounded"
+        />
 
-        <div className="mb-4">
-          <label htmlFor="transfusionRate" className="block text-gray-700 mb-2">
-            Transfusion Rate
-          </label>
-          <input
-            type="text"
-            id="transfusionRate"
-            name="transfusionRate"
-            value={formData.transfusionRate}
-            onChange={handleFormChange}
-            placeholder="e.g., 100 mL/hour"
-            className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-            required
-          />
-        </div>
+        <input
+          type="number"
+          name="amount"
+          placeholder="Amount (ml)"
+          value={formData.amount}
+          onChange={handleFormChange}
+          required
+          className="w-full px-4 py-2 border rounded"
+        />
 
-        <div className="mb-4">
-          <label htmlFor="reason" className="block text-gray-700 mb-2">
-            Reason for Transfusion
-          </label>
-          <textarea
-            id="reason"
-            name="reason"
-            value={formData.reason}
-            onChange={handleFormChange}
-            placeholder="Describe the medical reason for transfusion"
-            className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-            rows={4}
-            required
-          />
-        </div>
+        <input
+          type="text"
+          name="transfusion_rate"
+          placeholder="Transfusion Rate"
+          value={formData.transfusion_rate}
+          onChange={handleFormChange}
+          required
+          className="w-full px-4 py-2 border rounded"
+        />
+
+        <textarea
+          name="reason"
+          placeholder="Reason for Transfusion"
+          value={formData.reason}
+          onChange={handleFormChange}
+          required
+          className="w-full px-4 py-2 border rounded h-24"
+        />
+
+        <select
+          name="blood_type"
+          value={formData.blood_type}
+          onChange={handleFormChange}
+          required
+          className="w-full px-4 py-2 border rounded"
+        >
+          <option value="">Select Blood Type</option>
+          <option value="A+">A+</option>
+          <option value="A-">A-</option>
+          <option value="B+">B+</option>
+          <option value="B-">B-</option>
+          <option value="AB+">AB+</option>
+          <option value="AB-">AB-</option>
+          <option value="O+">O+</option>
+          <option value="O-">O-</option>
+          <option value="unknown">Unknown</option>
+        </select>
 
         <button
           type="submit"
-          className="bg-gradient-to-r from-red-600 to-red-800 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors"
+          className="bg-gradient-to-r from-red-600 to-red-800 text-white px-6 py-2 rounded hover:bg-red-700 transition"
         >
-          Submit Order
+          Submit Request
         </button>
       </form>
     </motion.div>
   );
 }
+function setSuccess(arg0: string) {
+  throw new Error("Function not implemented.");
+}
+

@@ -252,6 +252,7 @@ const DonateFormContent: React.FC<DonateFormContentProps> = ({ id, name, descrip
 
     const formDataToSubmit = new FormData();
     formDataToSubmit.append("hospital", id.toString());
+    formDataToSubmit.append("hospital_id", id);
     formDataToSubmit.append("first_name", formData.firstName);
     formDataToSubmit.append("middle_name", formData.middleName || "");
     formDataToSubmit.append("last_name", formData.lastName);
